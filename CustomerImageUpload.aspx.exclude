@@ -1,0 +1,158 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="CustomerImageUpload.aspx.cs" Inherits="CustomerImageUpload" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" Runat="Server">
+<script type = "text/javascript">
+    function Confirm() {
+        var confirm_value = document.createElement("INPUT");
+        confirm_value.type = "hidden";
+        confirm_value.name = "confirm_value";
+        if (confirm("Do you want to Update Image ?")) {
+            confirm_value.value = "Yes";
+        } else {
+            confirm_value.value = "No";
+        }
+        document.forms[0].appendChild(confirm_value);
+    }
+    </script>
+    <script type="text/Javascript" language ="javascript" >
+        function confirm_meth() {
+            if (confirm("Do you want to continue!Click 'YES'") == true) {
+                document.writeln("<b>You had click on 'YES' Button</b>");
+            }
+            else {
+                document.writeln("<b>You had clic on 'NO' Button</b>");
+            }
+        }
+</script>
+    </asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" Runat="Server">
+   
+    
+    <%--<table>
+ <tr>
+ 
+
+ <th class="style3">
+ <fieldset  >
+  <legend>Customer Image </legend>
+  
+  <table border="0" >
+
+    <tr>
+    <th  class="style2"> Customer </th> 
+    <th align="left" class="style1">
+    
+     
+     <asp:DropDownList ID ="customerDropDownList" runat="Server" style="margin-left: 0px" 
+            width="216px" Height="22px"></asp:DropDownList>
+     </th>
+   
+    
+
+    </tr>
+
+  
+
+     <tr> 
+    <th class="style2">Select Image</th>
+    <th align="left" class="style1"> <asp:FileUpload ID="FileUpload1" runat="server"  
+            /> </th>
+
+        
+    </tr>
+
+    <tr> 
+    
+    <th class="style1"> &nbsp;</th>
+
+        <th class="style4" align="left">
+
+            <asp:Button ID="btnimguplod" runat="server" Text="Upload Image"  onclick="upload" /> </th>
+    </tr>
+
+
+  
+    </table> 
+   
+  
+    
+ </fieldset>
+ 
+</th>
+
+<th class="style3"><fieldset   style="width: 213px; height: 102px;" >
+  
+  <asp:Image ID="Image1" runat="server" 
+        ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("id") %>' Height="108px" 
+        Width="159px" style="margin-top: 26px"/>
+  </fieldset></th>
+
+
+
+</tr>
+</table>--%>
+
+<center>
+<table width="600px">
+<tr><td style="width:400px"><fieldset style="height:200px">
+<legend>Customer Image &amp; Signature Upload</legend>
+<table width="400px"><tr><td style="width:100px"><label>Customer</label></td><td>
+    <asp:DropDownList ID ="customerDropDownList" runat="Server" style="margin-left: 0px" 
+            width="216px" Height="22px"  AutoPostBack="true" 
+        onselectedindexchanged="customerDropDownList_SelectedIndexChanged"></asp:DropDownList></td></tr>
+<tr><td style="width:100px"><label>Select Image</label></td><td><asp:FileUpload  width="216px" ID="FileUpload1" runat="server"  
+            /></td></tr>
+            <tr><td style="width:100px"><label>Select Signature</label></td><td><asp:FileUpload  width="216px" ID="FileUpload2" runat="server"  
+            /></td></tr>
+<tr><td></td><td><asp:Button ID="btnimguplod" runat="server" Text="Upload"  onclick="upload" />
+    <asp:Button ID="Button1" runat="server" Height="24px" Visible="false" OnClientClick="Confirm()" onclick="Button1_Click" 
+        Text="Update" Width="54px" />
+    </td></tr>
+</table></fieldset><asp:ScriptManager ID="ScriptManager1" runat="server">
+    </asp:ScriptManager>
+    </td>
+<td><fieldset style="height:200px">
+<legend>Image & Signature</legend>
+<table border="1px" width="200px">
+<tr><td><asp:GridView ID="Gridview1" AutoGenerateColumns="false" CssClass="Gridview" runat="server" Width="200px"
+HeaderStyle-BackColor="#7779AF" HeaderStyle-ForeColor="white">
+<Columns>
+
+<asp:TemplateField HeaderText="Image">
+<ItemTemplate>
+
+<asp:Image ID="Image1" runat="server" ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("CustomerID")+"&table_name=tblCustomerImage&column_name=CustomerImage&condition= where CustomerID=" %>' Height="100px" Width="100px"/>
+<%--<asp:Image ID="Image1" runat="server" ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("CustomerID") %>' Height="100px" Width="100px"/>--%>
+</ItemTemplate>
+</asp:TemplateField>
+<asp:TemplateField HeaderText="Signature">
+<ItemTemplate>
+
+<asp:Image ID="Image2" runat="server" ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("CustomerID")+"&table_name=tblCustomerImage&column_name=CustomerSignature&condition= where CustomerID=" %>' Height="100px" Width="100px"/>
+
+</ItemTemplate>
+</asp:TemplateField>
+</Columns>
+</asp:GridView></td></tr>
+</table>
+</fieldset></td></tr>
+</table>
+<table>
+<%--<tr><td><asp:GridView ID="Gridview1" CssClass="Gridview" runat="server" Width="500px"
+HeaderStyle-BackColor="#7779AF" HeaderStyle-ForeColor="white" AutoGenerateColumns="false">
+<Columns>
+
+<asp:TemplateField HeaderText="Image">
+<ItemTemplate>
+
+<asp:Image ID="Image1" runat="server" ImageUrl='<%# "Handler.ashx?id_Image="+ Eval("CustomerCode") %>' Height="400px" Width="600px"/>
+
+</ItemTemplate>
+</asp:TemplateField>
+</Columns>
+</asp:GridView></td></tr>--%>
+</table>
+ </center>
+  
+</asp:Content>
+

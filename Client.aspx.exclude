@@ -1,0 +1,503 @@
+﻿<%@ Register assembly="AjaxControlToolkit" namespace="AjaxControlToolkit" tagprefix="asp" %>
+<%--<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Customer.aspx.cs" Inherits="Customer" %>--%>
+
+
+<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true"
+    CodeFile="Client.aspx.cs" Inherits="Client" %>
+
+ <%--<script src="../../Scripts/jquery-1.3.2.min.js" language="javascript" type="text/javascript"/>
+
+<script src="../../Scripts/jquery-ui-1.7.1.custom.min.js" type="text/javascript"/>
+--%>
+
+
+
+
+ <asp:Content ID="BodyContent" runat="server" ContentPlaceHolderID="MainContent">
+  
+ <center>
+     <table style="height: 498px">
+ <tr>
+ <th class="style1">
+ <fieldset  style="width: 400px" >
+  <legend>Client Information </legend>
+
+  <table  border="0" >
+
+    <tr>
+    <th class="style2">Client ID</th>
+    <th class="style1"> 
+        <asp:TextBox ID="txtClientID" runat="server" 
+           width="200px" Enabled="False" ForeColor="#009933" ReadOnly="True" ></asp:TextBox> </th>
+      <th class="style4">
+
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ErrorMessage="Required" ValidationGroup="v" ForeColor="Red" ControlToValidate="txtClientID"
+                runat="server" />
+    </th>
+
+    </tr>
+
+    <tr>
+    <th class="style2">BIO ID</th>
+    <th class="style1"> <asp:TextBox ID="txtBIO" runat="server" 
+           width="200px" ></asp:TextBox> </th>
+      <th class="style4">
+
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator5" ErrorMessage="Required" ValidationGroup="v" ForeColor="Red" ControlToValidate="txtBIO"
+                runat="server" />
+    </th>
+
+    </tr>
+
+               
+    <tr> 
+    <th class="style2">Client Introducer</th>
+   <th>
+    <asp:DropDownList ID ="drpIntroducer" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px"></asp:DropDownList>
+    </th>
+    
+    <th class="style4">
+
+           <%-- <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="Required" ForeColor="Red" ControlToValidate="drpIntroducer"
+                runat="server" />--%>
+    </th>
+    </tr>
+
+
+    <tr> 
+    <th class="style2">Role</th>
+    <th>
+
+   <asp:DropDownList ID ="drpRoleID" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px"></asp:DropDownList>
+
+            </th>
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator6" ErrorMessage="Required" ValidationGroup="v" ForeColor="Red" ControlToValidate="drpRoleID"
+                runat="server" />
+    </th>
+    </tr>
+
+    <tr> 
+    <th class="style2" align="left">Client Type</th>
+     <th>
+
+   <asp:DropDownList ID ="drpClientTypeCode" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px"></asp:DropDownList>
+
+            </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator7" ErrorMessage="Required" ValidationGroup="v" ForeColor="Red" ControlToValidate="drpClientTypeCode"
+                runat="server" />
+    </th>
+    </tr>
+
+
+
+    <tr>
+    <th class="style2"> Charge Info</th> 
+    <th class="style1">
+     <%--<asp:Textbox ID ="txtGender" runat="Server"> </asp:Textbox>--%>
+     
+     <asp:DropDownList ID ="drpChareConfigaretionID" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px"></asp:DropDownList>
+     </th>
+
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator3" ErrorMessage="Required" ForeColor="Red" ValidationGroup="v" ControlToValidate="drpChareConfigaretionID"
+           InitialValue="--Select--"     runat="server" />
+    </th>
+
+    </tr>
+
+    <tr>
+    <th class="style2"> Transaction AC NO. </th> 
+    <th class="style1">
+
+ 
+   <asp:TextBox ID="txtTransactionACNo" runat="server" width="200px"></asp:TextBox>
+     
+
+     </th>
+      
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator14" ErrorMessage="Required" ForeColor="Red" ValidationGroup="v" ControlToValidate="txtTransactionACNo"
+             InitialValue="--Select--"  runat="server" />
+    </th>
+    </tr>
+
+
+    <tr>
+    <th class="style2"> Commision Rate </th> 
+    <th class="style1">
+
+ 
+   <asp:TextBox ID="txtComisionRate" runat="server" width="200px"></asp:TextBox>
+     
+
+     </th>
+      
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator15" ErrorMessage="Required" ForeColor="Red" ValidationGroup="v" ControlToValidate="txtComisionRate"
+             InitialValue="--Select--"  runat="server" />
+    </th>
+    </tr>
+
+
+    <tr>
+    <th class="style2"> MB Account Type </th> 
+    <th class="style1">
+
+     <asp:DropDownList ID ="drpMBAccountType" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px">
+            
+         <asp:ListItem Value="Single">Single</asp:ListItem>
+         <asp:ListItem Value="Joint">Joint</asp:ListItem>
+            
+            
+            </asp:DropDownList>
+     
+     </th>
+
+
+
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator16" ErrorMessage="Required" ValidationGroup="v" ForeColor="Red" ControlToValidate="drpMBAccountType"
+               InitialValue="--Select--" runat="server" />
+    </th>
+    </tr>
+
+         
+
+          <tr>
+    <th class="style2">MB HouseCode</th>
+    <th class="style1"> <asp:TextBox ID="txtMBHouseCode" runat="server" 
+           width="200px" ></asp:TextBox> </th>
+      <th class="style4">
+
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ErrorMessage="Required" ForeColor="Red" ValidationGroup="v" ControlToValidate="txtMBHouseCode"
+                runat="server" />
+    </th>
+
+    </tr>
+
+
+    <tr>
+    <th class="style2"> P. Atony Info </th> 
+    <th class="style1">
+
+ 
+   <asp:TextBox ID="txtPAtony" runat="server" width="200px"  Height="40px" TextMode="MultiLine"></asp:TextBox>
+     
+
+     </th>
+      
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator17" ErrorMessage="Required" ForeColor="Red" ValidationGroup="v" ControlToValidate="txtPAtony"
+             InitialValue="--Select--"  runat="server" />
+    </th>
+    </tr>
+
+
+
+
+
+
+    <tr> 
+    <th class="style5">Account Opening  Date</th>
+    
+
+ <th class="style6"> <asp:TextBox ID="txtACopeningDate" runat="server" width="200px"></asp:TextBox> 
+       
+  <asp:CalendarExtender ID="CalendarExtender1"   Format="dd/MM/yyyy" runat="server" 
+        TargetControlID="txtACopeningDate">
+    </asp:CalendarExtender>
+
+     </th>
+
+     <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="Required" ValidationGroup="v" ForeColor="Red" ControlToValidate="txtACopeningDate"
+               InitialValue="--Select--" runat="server" />
+    </th>
+
+     </tr>
+ 
+ <tr>
+ 
+ <th>
+ </th>
+
+
+ <th>
+ <asp:Button  ID ="txtCSave" Text="Save" runat="Server" Width="100px" 
+         onclick="txtCSave_Click"  > </asp:Button>
+     
+     <asp:Button  ID ="txtNew" Text="New" runat="Server" Width="100px" > </asp:Button>
+   
+ </th>
+
+ </tr>
+
+    </table> 
+
+
+    <table>
+    
+ 
+    </table> 
+
+
+ </fieldset>
+</th>
+
+<th>
+
+
+  <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+    </asp:ToolkitScriptManager>
+</th>
+</tr>
+</table>
+<table ><tr><td></td><td colspan="3">
+        <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+            <ContentTemplate>
+                <asp:GridView ID="GridView1" runat="server" AllowPaging="true" 
+                    AutoGenerateColumns="false" DataKeyNames="ClSL"
+                    OnPageIndexChanging="GridView1_PageIndexChanging" 
+                    OnRowCancelingEdit="GridView1_RowCancelingEdit" 
+                    OnRowDeleting="GridView1_RowDeleting" OnRowEditing="GridView1_RowEditing" 
+                    OnRowUpdating="GridView1_RowUpdating" PageSize="5" 
+                    onrowdatabound="GridView1_RowDataBound">
+                    <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                    <Columns>
+     <%--<asp:ButtonField   Text="SingleClick" CommandName="SingleClick"  />--%>
+                        <asp:TemplateField Visible="false" >
+                            <EditItemTemplate>
+                                <asp:TextBox ID="ClSLTextbox" runat="server" Text='<%#Eval("ClSL") %>' 
+                                     ></asp:TextBox>
+                                
+
+                            </EditItemTemplate>
+
+                            <ItemTemplate>
+
+
+                                <asp:Label ID="idLabel" runat="server" Text='<%#Eval("ClSL") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="Client ID">
+                            <EditItemTemplate>
+                                <asp:TextBox ID="GClientIDtxt" Enabled ="false" runat="server" Text='<%#Eval("ClientID") %>' 
+                                    ></asp:TextBox>
+                            </EditItemTemplate>
+                            
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="ClientID" runat="server" 
+                                    Text='<%#Eval("ClientID") %>'></asp:Label>
+                            </ItemTemplate>
+                            
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="Client BIO">
+                            <EditItemTemplate>
+                                <asp:TextBox ID="GClientBIO" runat="server" Text='<%#Eval("ClientBIO") %>' 
+                                    ></asp:TextBox>
+                            </EditItemTemplate>
+                            
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="ClientBIO" runat="server" 
+                                    Text='<%#Eval("ClientBIO") %>'></asp:Label>
+                            </ItemTemplate>
+                            
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="Client Introducer">
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="ChargeCategoryNameLabel" runat="server" 
+                                    Text='<%#Eval("ClientIntroducer") %>'></asp:Label>
+                            </ItemTemplate>
+                            <EditItemTemplate>
+                             <asp:TextBox ID="GClientIntroducerdrop" runat="server" Text='<%#Eval("ClientIntroducer") %>' 
+                                    ></asp:TextBox>
+                            </EditItemTemplate>
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="MB House Code">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GMBHouseCode" runat="server" Text='<%#Eval("MBHouseCode") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="RRemarks" runat="server" Text='<%#Eval("MBHouseCode") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="Role Code">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GRoleCodetxt" runat="server" Text='<%#Eval("RoleCode") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="drpRoleCode" runat="server" Text='<%#Eval("RoleCode") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="Client Type">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GClientTypeCodetxt" runat="server" Text='<%#Eval("ClientTypeCode") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="drpClientTypeCode" runat="server" Text='<%#Eval("ClientTypeCode") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                       
+                        <asp:TemplateField HeaderText="Charge Category">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GChargeCategoryCodetxt" runat="server" Text='<%#Eval("ChargeCategoryCode") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="drpChargeCategoryCode" runat="server" Text='<%#Eval("ChargeCategoryCode") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        
+                        <asp:TemplateField HeaderText="Discunt">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GClientSpecialComissionRatetxt" runat="server" Text='<%#Eval("ClientSpecialComissionRate") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="txtClientSpecialComissionRate" runat="server" Text='<%#Eval("ClientSpecialComissionRate") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        
+                        <asp:TemplateField HeaderText="Transaction Account">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GClientTransactionAccounttxt" runat="server" Text='<%#Eval("ClientTransactionAccount") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="txtClientTransactionAccount" runat="server" Text='<%#Eval("ClientTransactionAccount") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+
+                        <asp:TemplateField HeaderText="Account Type">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GAccountTypetxt" runat="server" Text='<%#Eval("AccountType") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="txtAccountType" runat="server" Text='<%#Eval("AccountType") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField>
+       <ItemTemplate>
+                <asp:LinkButton ID="btnPrint" ForeColor="Black" runat="server" Text="Print" OnClick="btnPrint_Click" />
+        </ItemTemplate>
+    </asp:TemplateField>
+                      <%--  <asp:TemplateField HeaderText="Acccount Opening Date">
+                            <EditItemTemplate>
+                              
+                                     <asp:TextBox ID="GacccountOpeningDate" runat="server" Text='<%#Eval("acccountOpeningDate") %>' 
+                                    ></asp:TextBox>
+
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="txtacccountOpeningDate" runat="server" Text='<%#Eval("acccountOpeningDate") %>' 
+                                    ></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>--%>
+                        
+                       
+                        <asp:CommandField ShowEditButton="true" />
+                        <asp:CommandField ShowDeleteButton="true" />
+                    </Columns>
+                    <EditRowStyle BackColor="#999999" />
+                    <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                    <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                    <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                    <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                    <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                    <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                    <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                    <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                    <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+                </asp:GridView>
+            </ContentTemplate>
+        </asp:UpdatePanel>
+        </td><td>&nbsp;</td></tr></table>
+</center>
+
+</asp:Content>
+
+
+<asp:Content ID="Content1" runat="server" contentplaceholderid="HeadContent">
+    <style type="text/css">
+        .style1
+        {
+            width: 375px;
+
+        }
+        .style2
+        {
+            width: 594px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+        }
+        .style4
+        {
+            width: 46px;
+        }
+    .style5
+    {
+        width: 594px;
+        text-align: left;
+        background-color: #0B5E0A;
+        font-family: Tahoma;
+        color: #FFFAF0;
+        font-size: 10pt;
+        font-weight: 500;
+        height: 36px;
+    }
+    .style6
+    {
+        width: 375px;
+        height: 36px;
+    }
+    </style>
+</asp:Content>
+

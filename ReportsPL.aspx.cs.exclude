@@ -1,0 +1,181 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+
+
+public partial class ReportsPL : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            LoadBranch(1, "");
+        }
+        
+    }
+    public void LoadBranch(int a, string code)
+    {
+        DataSet ds = new DataSet();
+        SqlConnection conn = dbconnection.connection();
+        //string quiry = "select code from program where Code <>'" + code + "'  order by code";
+
+        string quiry = "select BranchName,BrCode  from BranchInfo  order by  BranchName";
+
+
+
+        SqlDataAdapter dt = new SqlDataAdapter(quiry, conn);
+        dt.Fill(ds);
+        drpBranch.DataSource = ds;
+        drpBranch.DataTextField = "BranchName";
+        drpBranch.DataValueField = "BrCode";
+        drpBranch.DataBind();
+
+        if (a == 1)
+        {
+            drpBranch.Items.Insert(0, "--Select--");
+        }
+
+    }
+
+    protected void PLSummary_Click(object sender, EventArgs e)
+    {
+
+        if (Session["user"].ToString() != drpBranch.SelectedValue && Session["user"].ToString() != "Admin")
+        {
+            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+
+            return;
+        }
+
+       
+        
+        
+        
+        
+        if (validation() == 1)
+            return; 
+
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("update PLSummary Set   brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+        objcmd.ExecuteNonQuery();
+        conn.Close();
+
+        Session["rpttype"] = "SummaryReport";
+
+        ReportControl1.DisplayReport(Server.MapPath("./Reports/RPTPLSummary.rpt"));
+
+        //F:\\FRD\T24GLReporting\T24GL\Reports
+              //string strFilename=  "D:\\GLData\\PL.Txt";
+
+    }
+    protected void PLConfigrpt_Click(object sender, EventArgs e)
+    {
+        if (Session["user"].ToString() != drpBranch.SelectedValue && Session["user"].ToString() != "Admin")
+        {
+            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+
+            return;
+        }
+
+
+        
+        
+        
+        if (validation() == 1)
+            return; 
+
+
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("update PLBalanceConfigaretion Set   brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+        objcmd.ExecuteNonQuery();
+        conn.Close();
+
+     
+       
+
+   
+        //int check = 1;
+        //Session["Chek"] = check;
+
+        if (Iszero.Checked == false )
+  
+        {
+
+            Session["rpttype"] = "ConfigReport";
+            ReportControl1.DisplayReportCon(Server.MapPath("~/Reports/RPTPLConfiguretion.rpt"));
+        
+        }
+
+        else  
+        {
+
+            Session["rpttype"] = "ConfigReportZ";
+
+            ReportControl1.DisplayReportCon(Server.MapPath("~/Reports/RPTPLConfiguretionnonWZero.rpt"));
+         
+
+        
+
+        }
+
+        
+    }
+    public int validation()
+    {
+        int i = 0;
+        if (drpBranch.Text == "--Select--")
+
+
+        {
+            string message = "Please Select Valid Branch. ";
+            ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+
+
+            i = 1;
+        
+        }
+
+        return i;
+    }
+
+
+
+
+    protected void PlConfigureDetais_Click(object sender, EventArgs e)
+    {
+
+        if (Session["user"].ToString() != drpBranch.SelectedValue && Session["user"].ToString() !="Admin" )
+        {
+            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+
+            return;
+        }
+
+        
+        
+        
+        if (validation() == 1)
+            return;
+
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("update PLBalanceConfigaretion Set   brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+        objcmd.ExecuteNonQuery();
+        conn.Close();
+
+        Session["rpttype"] = "PLConfigOriginal";
+
+        ReportControl1.DisplayReportConfigure(Server.MapPath("./Reports/RPTPLConfiguretionOriginal.rpt"));
+
+
+    }
+}
+
+

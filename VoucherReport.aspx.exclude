@@ -1,0 +1,84 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="VoucherReport.aspx.cs" Inherits="Report" %>
+
+<%@ Register Assembly="AjaxControlToolkit" Namespace="AjaxControlToolkit" TagPrefix="cc1" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" runat="server">
+    <style type="text/css">
+        .style1
+        {
+            width: 43px;
+        }
+        .style2
+        {
+            width: 26px;
+        }
+    </style>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <cc1:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+    </cc1:ToolkitScriptManager>
+    <table width="630px" align="center">
+    <tr>
+    <td>
+    <fieldset>
+    <table>
+    <tr>
+    <td >
+        <label>&nbsp;Date:</label></td>
+    <td class="style1">
+      <asp:TextBox ID="fromDateTextBox" runat="server" Height="20px" 
+            Width="74px"  />
+
+        </td>
+    <td> 
+        <asp:ImageButton ID="imgPopup" ImageUrl="image/calendar.png" ImageAlign="Bottom"
+        runat="server" />
+    <cc1:CalendarExtender ID="fromDateCalendar" PopupButtonID="imgPopup" runat="server" TargetControlID="fromDateTextBox"
+        Format="dd/MM/yyyy">
+    </cc1:CalendarExtender></td>
+    <td >&nbsp;</td>
+   
+    <td>
+        &nbsp;</td>
+         <td class="style2">&nbsp;</td><td>
+        <asp:Label ID="Label1" runat="server" ForeColor="Red" Text="dd/MM/yyyy"></asp:Label></td>
+    </tr>
+     <tr>
+     <td ></td>
+     <td colspan="4">
+         <asp:DropDownList ID="VoucherDropDownList" runat="server">
+            
+         </asp:DropDownList>
+        
+     </tr>
+      <tr>
+     <td></td>
+     <td colspan="4">
+         <asp:RadioButton ID="summaryReportRadioButton" runat="server" Text="Summary Report" GroupName="a" Checked="true"  />
+         <br />
+         <asp:RadioButton ID="detailsReportRadioButton" runat="server" Text="Details Report" GroupName="a"/>
+          <br />
+         <asp:RadioButton ID="dayWiseReportRadioButton" runat="server"  Text="Day Wise Report" GroupName="a"   />
+          </td>
+     </tr>
+    <tr><td>
+        
+        </td>
+        <td colspan="2">
+        <asp:Button ID="Button1" CssClass="menu" runat="server" Text="Show Report" 
+            onclick="showReportButton_Click" Width="97px" />
+            </td>
+            <td>
+                &nbsp;</td>
+        </tr>
+    </table>
+     
+       
+    </fieldset> 
+    
+     </td>
+    </tr>
+   
+    </table>
+
+</asp:Content>
+

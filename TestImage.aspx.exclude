@@ -1,0 +1,38 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="TestImage.aspx.cs" Inherits="TestImage" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" Runat="Server">
+
+    <br />
+    <asp:ScriptManager ID="ScriptManager1" runat="server" />
+    <br />
+    <div>
+        <br />
+        <table width="50%" cellpadding="2" cellspacing="0">
+            <br />
+            <tr>
+                <br />
+                <td>
+                    <br />
+                    <asp:UpdatePanel ID="UpdatePanel1" runat="server" UpdateMode="conditional">
+                        <ContentTemplate>
+                            <br />
+                            <asp:FileUpload ID="FileUpload1" runat="server" /><br />
+                            <asp:Button ID="btnUpload" runat="server" Text="Upload" OnClick="btnUpload_Click" /><br />
+                        <br />
+                        <asp:Image ID="imgViewFile" runat="server" />
+                        </ContentTemplate>
+                        <Triggers> <asp:PostBackTrigger ControlID="btnUpload" /> </Triggers> 
+                         
+                    </asp:UpdatePanel>
+                    
+                </td>
+            </tr>  
+        </table>
+        <br />
+    </div>
+    <br />
+
+</asp:Content>
+

@@ -1,0 +1,223 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class ChargeConfigaretion : System.Web.UI.Page
+{
+    ChargeInformationDAO oChargeInformationDAO = new ChargeInformationDAO();
+    ChargeConfigurationEntity oChargeConfigurationEntity = new ChargeConfigurationEntity();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+
+            gridViewBind();
+            dropDownListBind();
+        }
+    }
+
+    private void dropDownListBind()
+    {
+        oChargeInformationDAO = new ChargeInformationDAO();
+        DataTable dt = oChargeInformationDAO.GetChargeItem("");
+        drpCICode.DataSource = dt;
+       
+        drpCICode.DataTextField = "ChargeDetails";
+        drpCICode.DataValueField = "ChargeCode";
+        drpCICode.DataBind();
+        dt = new DataTable();
+        dt = oChargeInformationDAO.GetChargeCategory("");
+        drpCCCode.DataSource = dt;
+      
+        drpCCCode.DataTextField = "ChargeCategoryName";
+        drpCCCode.DataValueField = "ChargeCategoryCode";
+        drpCCCode.DataBind();
+    }
+    //protected void GridView1_RowCommand(object sender, GridViewCommandEventArgs e)
+    //{
+
+    //}
+    protected void btnCCSave_Click(object sender, EventArgs e)
+    {
+        oChargeConfigurationEntity = new ChargeConfigurationEntity();
+        oChargeConfigurationEntity.ChargeCategoryCode =drpCCCode.SelectedValue;
+        oChargeConfigurationEntity.ChargeCode = drpCICode.SelectedValue;
+        oChargeConfigurationEntity.ChargeConfigurationDetails = txtCCName.Text.ToUpper();
+        oChargeConfigurationEntity.ChargeCRemarks = txtConRemarks.Text;
+        oChargeConfigurationEntity.ChargeCCreatedBy = "";//session["userId"] needed;
+        oChargeConfigurationEntity.ChargeCLastModifiedBy = "";
+        string condition = " where ChargeConfigurationDetails='" + oChargeConfigurationEntity.ChargeConfigurationDetails + "'";
+        DataTable dt = oChargeInformationDAO.GetChargeCategory(condition);
+        string message = "";
+        if (dt.Rows.Count == 0)
+        {
+            int i = oChargeInformationDAO.InsertChargeConfiguration(oChargeConfigurationEntity);
+            if (i == 1)
+            {
+                message = "Data Inserted Successfully";
+                Clear();
+            }
+            else
+                message = "Data Not Inserted!";
+
+        }
+        else
+        {
+            message = "Branch Alreay in DataBase";
+        }
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+    protected void txtCCNew_Click(object sender, EventArgs e)
+    {
+        Clear();
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        GridView1.PageIndex = e.NewPageIndex;
+        gridViewBind();
+        //GridView1.DataSource = oCollectionAccount.GetCustomer(Session["brCode"].ToString(), "");
+        //GridView1.DataBind();
+
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+        ////int customerId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        ////        //getting row field details
+        TextBox ChargeConfigurationDetailsTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("ChargeConfigurationDetailsTextBox");
+
+        TextBox ChargeCRemarksTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("ChargeCRemarksTextBox");
+        
+        DropDownList ChargeDetailsDropDownList = (DropDownList)GridView1.Rows[e.RowIndex].FindControl("ChargeDetailsDropDownList");
+        DropDownList ChargeCategoryNameDropDownList = (DropDownList)GridView1.Rows[e.RowIndex].FindControl("ChargeCategoryNameDropDownList");
+        oChargeConfigurationEntity = new ChargeConfigurationEntity();
+        oChargeConfigurationEntity.ChargeCategoryCode = ChargeCategoryNameDropDownList.SelectedValue;
+        oChargeConfigurationEntity.ChargeCode = ChargeDetailsDropDownList.SelectedValue;
+        oChargeConfigurationEntity.ChargeConfigurationDetails = ChargeConfigurationDetailsTextBox.Text.ToUpper();
+        oChargeConfigurationEntity.ChargeCRemarks = ChargeCRemarksTextBox.Text;
+        oChargeConfigurationEntity.ChargeCLastModifiedBy = "";//session["userId"] needed;
+        
+        //oChargeItemEntity.ChargeCode = txtChargeCode.Text;
+        oChargeConfigurationEntity.ChargeConfigurationID = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oChargeInformationDAO.UpdateChargeConfiguration(oChargeConfigurationEntity);
+        string message = "";
+        GridView1.EditIndex = -1;
+
+
+        if (i == 1)
+            message = "Data Updated Successfully";
+        else
+            message = "Data Not Updated!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+        
+        oChargeConfigurationEntity = new ChargeConfigurationEntity();
+        //oChargeItemEntity.ChargeCode = txtChargeCode.Text;
+        oChargeConfigurationEntity.ChargeConfigurationID = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oChargeInformationDAO.DeleteChargeConfiguration(oChargeConfigurationEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+            message = "Data Deleted Successfully";
+        else
+            message = "Data Not Deleted!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+
+        // gvbind();
+
+    }
+
+    private void gridViewBind()
+    {
+        oChargeInformationDAO = new ChargeInformationDAO();
+        string condition = " order by ChargeConfigurationID desc";
+        DataTable dt = oChargeInformationDAO.GetChargeConfiguration(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    private void Clear()
+    {
+        txtConRemarks.Text = "";
+        txtCCName.Text = "";
+    }
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+                oChargeInformationDAO = new ChargeInformationDAO();
+                oChargeConfigurationEntity = new ChargeConfigurationEntity();
+                oChargeConfigurationEntity.ChargeConfigurationID = Convert.ToInt32(GridView1.DataKeys[e.Row.RowIndex].Value.ToString());
+                string condition=" where ChargeConfigurationID='"+oChargeConfigurationEntity.ChargeConfigurationID+"'"; 
+               DataTable oDatTable=oChargeInformationDAO.GetChargeConfiguration(condition);
+               DataTable dt = oChargeInformationDAO.GetChargeItem("");
+            if (dt.Rows.Count > 0)
+            {  
+
+                DropDownList ChargeDetailsDropDownList =(DropDownList)e.Row.FindControl("ChargeDetailsDropDownList");
+                ChargeDetailsDropDownList.DataSource = dt;
+                ChargeDetailsDropDownList.DataTextField = "ChargeDetails";
+                ChargeDetailsDropDownList.DataValueField = "ChargeCode";
+                ChargeDetailsDropDownList.DataBind();
+                if(oDatTable.Rows.Count>0)
+                {
+                    ChargeDetailsDropDownList.SelectedValue = oDatTable.Rows[0]["ChargeCode"].ToString();
+                }
+            }
+            dt = new DataTable();
+            dt = oChargeInformationDAO.GetChargeCategory("");
+            if (dt.Rows.Count > 0)
+            {
+
+                DropDownList ChargeCategoryNameDropDownList = (DropDownList)e.Row.FindControl("ChargeCategoryNameDropDownList");
+                ChargeCategoryNameDropDownList.DataSource = dt;
+                ChargeCategoryNameDropDownList.DataTextField = "ChargeCategoryName";
+                ChargeCategoryNameDropDownList.DataValueField = "ChargeCategoryCode";
+                ChargeCategoryNameDropDownList.DataBind();
+                if (oDatTable.Rows.Count > 0)
+                {
+                    ChargeCategoryNameDropDownList.SelectedValue = oDatTable.Rows[0]["ChargeCategoryCode"].ToString();
+                }
+            }
+             
+               
+
+        }
+    }
+   
+}

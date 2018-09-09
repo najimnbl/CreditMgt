@@ -1,0 +1,209 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Text;
+using System.Xml;
+using ImmunizationService;
+using System.Diagnostics;
+using System.IO;
+using System.Xml.Linq;
+using System.Globalization;
+
+
+
+    public partial class Report : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Session["userId"] == null)
+                Response.Redirect("Login.aspx");
+            if (!IsPostBack)
+            { 
+              
+                fromDateTextBox.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                toDateTextBox.Text = DateTime.Now.ToString("dd/MM/yyyy");
+
+                loadDropDownList();
+            }
+
+
+        }
+
+        private void loadDropDownList()
+        {
+            collectionAccount oCollectionAccount = new collectionAccount();
+            DataTable dt = oCollectionAccount.GetBranchInfo();
+            VoucherDropDownList.DataSource = dt;
+            VoucherDropDownList.DataTextField = "brName";
+            VoucherDropDownList.DataValueField = "brCode";
+            VoucherDropDownList.DataBind();
+            VoucherDropDownList.Items.Insert(0,new ListItem("ALL"," AND 1=1"));
+
+        }
+
+        protected void showReportButton_Click(object sender, EventArgs e)
+        {
+            //string userId = Session["userId"].ToString();
+            //collectionAccount oCollectionAccount = new collectionAccount();
+            ////string fromDate = fromDateTextBox.Text;
+            ////string toDate = toDateTextBox.Text;
+            //string[] sa = fromDateTextBox.Text.Split('/');
+            //string[] sa1 = toDateTextBox.Text.Split('/');
+            //string fromDate = sa[2] + "-" + sa[1] + "-" + sa[0];
+            //string toDate = sa1[2] + "-" + sa1[1] + "-" + sa1[0];
+            //string condition = "";
+            //string reportName = "";
+            //string condition1 = "";
+            //condition = " where COLLECTION_DATE between '" + fromDateTextBox.Text + "' and '" + toDateTextBox.Text + "'";
+            //if (branchDropDownList.SelectedItem.Text == "ALL")
+            //{
+            //    condition1 = branchDropDownList.SelectedValue;
+            //    condition += branchDropDownList.SelectedValue;
+            //    Session["brName"] = "";
+            //}
+            //else
+            //{
+            //    condition1= " AND BRANCH_ID='" + branchDropDownList.SelectedValue + "'";
+            //    condition += " AND BRANCH_ID='" + branchDropDownList.SelectedValue + "'";
+            //    Session["brName"] =branchDropDownList.SelectedItem.Text+ " BRANCH";
+
+            //}
+
+
+            //DataTable dt = new DataTable();
+            //DateWiseReportDataSet ds = new DateWiseReportDataSet();
+            //if (summaryReportRadioButton.Checked)
+            //{
+
+            //    reportName = "DESCO - Bill Collection Statement (Summarized)";
+            //    dt = oCollectionAccount.GetSummaryReport(condition);
+            //    ds.Tables["SummaryReport"].Merge(dt);
+            //}
+            //else if(detailsReportRadioButton.Checked)
+            //{
+            //    reportName = "DESCO - Bill Collection Statement (Details)";
+            //    dt = oCollectionAccount.GetDetailReport(condition);
+            //    ds.Tables["DetailReport"].Merge(dt);
+            //}
+            //else if (dayWiseReportRadioButton.Checked)
+            //{
+
+            //    DateTime d = DateTime.ParseExact(fromDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            //    oCollectionAccount.insertDateTable(d);
+              
+            //    string month=DateTime.ParseExact(fromDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).Month.ToString();
+            //       if(month.Length==1)
+            //        month = "0" + DateTime.ParseExact(fromDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).Month.ToString();
+            //        string fDate = "01/" + month + "/" + DateTime.ParseExact(fromDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).Year.ToString();
+            //        string tDate = oCollectionAccount.GetDaysInMonth(DateTime.ParseExact(fromDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).Year, int.Parse(month)) + "/" + month + "/" + DateTime.ParseExact(fromDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture).Year.ToString();
+
+            //        reportName = "DESCO - Bill Collection Statement (Day Wise)";
+            //        dt = oCollectionAccount.GetDayWiseReport(condition1,fDate,tDate);
+            //        ds.Tables["DayWiseReport"].Merge(dt);
+             
+            //}
+            //if (paymentConfirmedRadioButton.Checked)
+            //{
+            //    condition = "";
+            //    reportName = "Payment confirmed Report";
+            //}
+            //else if (paymentCancelRadioButton.Checked)
+            //{
+            //    condition = "";
+            //    reportName = "Payment Cancel Report";
+            //}
+            //DataTable dt = oCollectionAccount.GetSummaryAndDetailsReport(condition);
+            //dt.TableName = "DateWiseReportDataTable";
+            //DateWiseReportDataSet ds = new DateWiseReportDataSet();
+            //ds.Tables[0].Merge(dt);
+            //Session["ds"] = ds;
+            //Session["ReportName"] = reportName;
+            //Session["fromDate"] = fromDateTextBox.Text;
+            //Session["toDate"] = toDateTextBox.Text;
+            //////string d = DateTime.Now.ToString("dd/MM/yyyy");
+            //Response.Redirect("ReportViewer.aspx");
+
+        }
+        protected void ImageButton2_Click(object sender, ImageClickEventArgs e)
+        {
+           ////Microsoft.Office.Interop.Excel.Application excelApp = new Microsoft.Office.Interop.Excel.Application();
+           //// excelApp.Visible = true;
+           ////Microsoft.Office.Interop.Excel Microsoft.Office.Interop.Excel.Workbook newWorkbook = excelApp.Workbooks.Add();
+           //// string workbookPath = "d:/SomeWorkBook.xls";
+           //// Microsoft.Office.Interop.Excel.Workbook excelWorkbook = excelApp.Workbooks.Open(workbookPath,
+           ////         0, false, 5, "", "", false, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "",
+           ////         true, false, 0, true, false, false);
+           //// Microsoft.Office.Interop.Excel.Sheets excelSheets = excelWorkbook.Worksheets;
+           // if (Session["brCode"] == null)
+           //     Response.Redirect("Login.aspx");
+           // string brCode = Session["brCode"].ToString();
+           // ImmunizationService.Enquiry service = new ImmunizationService.Enquiry();
+           // string[] sa = fromDateTextBox.Text.Split('/');
+           // string[] sa1 = toDateTextBox.Text.Split('/');
+           // string fromDate = sa[2] + "-" + sa[1] + "-" + sa[0];
+           // string toDate = sa1[2] + "-" + sa1[1] + "-" + sa1[0];
+           // string fromDate1 = Convert.ToDateTime(fromDate).ToString("dd-MMM-yy");
+           // string toDate1 = Convert.ToDateTime(toDate).ToString("dd-MMM-yy");
+           // //////string fromDate = Convert.ToDateTime(fromDateTextBox.Text).ToString();
+           // //////string toDate = Convert.ToDateTime(toDateTextBox.Text).ToString();
+            
+           // try
+           // {
+           //     MemoryStream oStream=new MemoryStream();
+           //     service.Timeout = -1;
+           //    // List<COLLECTION> c = new List<COLLECTION>(service.Export_to_xml("NBL", "NBL", fromDate1, toDate1, brCode));
+           //     //Microsoft.Office.Interop.Excel.Application excel = new Microsoft.Office.Interop.Excel.Application();
+           //     //XDocument doc = XDocument.Parse(service.Export_to_xml("NBL", "NBL", fromDate1, toDate1, brCode));
+           //   //  string[] n = service.Export_to_xml("NBL", "NBL", fromDate1, toDate1, brCode);
+           //     // Open Workbook
+           //     //excel.Workbooks.Open(service.Export_to_excel("NBL", "NBL", fromDate1, toDate1, brCode), ReadOnly: true);
+           //     //ReportDocument myReportDocument = new ReportDocument();
+              
+           //     //Response.Clear();
+           //     //Response.Buffer = true;
+           //     //Response.ContentType = "application/pdf";
+           //     //Response.AddHeader("Content-Disposition", "attachment; filename=BranchWiseReport.pdf");
+           //     //Response.BinaryWrite(oStream.ToArray());
+           //     //Response.End();
+           //     //object l = service.Export_to_xml("NBL", "NBL", fromDate1, toDate1, brCode);
+           //     //Response.Redirect(service.Export_to_excel("NBL", "NBL", fromDate1, toDate1, brCode));
+           //   //  this.Page.Response.ContentType=service.Export_to_excel("NBL", "NBL", fromDate1, toDate1, brCode);
+           //   //  Response.ContentType = "application/vnd.ms-excel";
+           //   //  Response.Flush();
+           //   //// Microsoft.Office.Interop.Excel.Workbook newWorkbook = excelApp.Workbooks.Add(m);
+           //     //XmlDocument doc = new XmlDocument();
+           //     //XmlReader reader = new XmlReader();
+
+           //     //List<string>COLL = new List<string>() { "BR_ID", "TRANS_DT", "BILL_NO", "ACCOUNT_NO", "WATER_BILL", "SEWER_BILL", "VAT", "FIXED_CHARGE", "SUR_CHARGE", "TOTAL_BILL", "COLLECTED_AMT" };
+           //     // COLL.Add(service.Export_to_xml("NBL", "NBL", fromDate1, toDate1, brCode));
+
+           //     //dt = (DataTable)();
+           //     //System.Diagnostics.Process.Start("http://www.google.com");                
+           //    //string url = http://192.168.135.244/wsAqua.Service/enquiry.asmx;
+           //     string url = "http://192.168.135.244/wsAqua.Service/enquiry.asmx?op=Export_to_excel";
+           //     // string browserPath = GetStandardBrowserPath();
+           //     //Response.Write(String.Format("window.open('{0}','_blank')", ResolveUrl(url)));
+           //         //Response.Redirect(url);
+           //     string newScript = "<script language='javascript'>window.open('" + url + "', '_blank');</script>";
+
+           //     ClientScript.RegisterStartupScript(this.GetType(), "OpenUrl", newScript);
+                
+           //     //Response.Redirect("http://192.168.135.244/wsAqua.Service/enquiry.asmx/Export_to_excel?user_in='NBL'&psw_in='NBL'&from_date_in='" + fromDate1 + "'&to_date_in='" + toDate1 + "'&br_id_in='" + brCode + "'");
+           //     //wsAqua.Service/enquiry.asmx/Export_to_excel?user_in=string&psw_in=string&from_date_in=string&to_date_in=string&br_id_in=string
+
+           // }
+           // catch { }
+
+        }
+
+        //public List<string> List { get; set; }
+
+        protected void branchDropDownList_DataBound(object sender, EventArgs e)
+        {
+            //branchDropDownList.Items.Insert(0, new ListItem("ALL", " AND 1=1"));
+        }
+}

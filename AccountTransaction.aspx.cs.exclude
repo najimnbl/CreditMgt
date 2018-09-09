@@ -1,0 +1,940 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Globalization;
+using System.Data.SqlClient;
+public partial class AccountTransaction : System.Web.UI.Page
+{
+    decimal creditAmount = 0;
+    decimal debitAmount = 0;
+    DataTable table = new DataTable();
+    DataRow dtRow;
+    BankInformationDAO oBankInformationDAO = new BankInformationDAO();
+    TransactionAccountDAO oTransactionAccountDAO = new TransactionAccountDAO();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        //for (int i = 0; i < 100; i++)
+        //{
+
+        //    accountNoDropDownList.Items.Add("Items " + i.ToString());
+        //}
+        if (!IsPostBack)
+        {
+            voucherDateTextBox.Text = DateTime.Now.ToString("dd/MM/yyyy");
+        
+            loadDropDownList();
+          
+            SetInitialRow();  
+           
+        }
+
+    }
+
+    private void loadDropDownList()
+    {
+        #region ChartOfAccount
+        ChartOfAccountDAO oChartOfAccountDAO = new ChartOfAccountDAO();
+        string condition1="client";
+        if (coaRadioButton.Checked == true)
+            condition1 = "coa";
+
+        DataTable dt = oChartOfAccountDAO.GetChartOfAccountForDropDown(condition1);
+        accountNoDropDownList.DataSource = dt;
+        accountNoDropDownList.DataTextField = "AccInfo";
+        accountNoDropDownList.DataValueField = "CoAccNo";
+        accountNoDropDownList.DataBind();
+        if(dt.Rows.Count>0)
+        //accountNameLabel.Text = dt.Rows[0]["CoAccName"].ToString();
+
+        #endregion
+        #region BankInformation
+       
+        dt = oBankInformationDAO.GetBank(" order by BankName");
+        bankDropDownList.DataSource = dt;
+        bankDropDownList.DataTextField = "BankName";
+        bankDropDownList.DataValueField = "bankId";
+        bankDropDownList.DataBind();
+        if (dt.Rows.Count > 0)
+        {
+            string condition = " where tblBankBranch.Bankid=" + dt.Rows[0]["Bankid"] + " ";
+            dt = oBankInformationDAO.GetBankBranch(condition);
+            branchDropDownList.DataSource = dt;
+            branchDropDownList.DataTextField = "BranchName";
+            branchDropDownList.DataValueField = "BranchID";
+            branchDropDownList.DataBind();
+
+        }
+        #endregion
+    }
+    protected void accountNoDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        //string[] n = accountNoDropDownList.SelectedItem.Text.Split('|');
+        //accountNameLabel.Text = n[1];
+    }
+    protected void bankDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        string condition = " where tblBankBranch.Bankid=" + bankDropDownList.SelectedValue + " ";
+        DataTable dt = oBankInformationDAO.GetBankBranch(condition);
+        branchDropDownList.DataSource = dt;
+        branchDropDownList.DataTextField = "BranchName";
+        branchDropDownList.DataValueField = "BranchID";
+        branchDropDownList.DataBind();
+    }
+    protected void transModeDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (transModeDropDownList.SelectedItem.Text == "Bank")
+        {
+            bankRow.Visible = true;
+            branchRow.Visible = true;
+            chequeNoRow.Visible = true;
+            chequeDateRow.Visible = true;
+            bankAccNoRow.Visible = true;
+            chequeDateTextBox.Text = DateTime.Now.ToString("dd/MM/yyyy");
+        }
+        else
+        {
+            bankRow.Visible = false;
+            branchRow.Visible = false;
+            chequeNoRow.Visible = false;
+            chequeDateRow.Visible = false;
+            bankAccNoRow.Visible = false;
+            chequeDateTextBox.Text = "";
+        }
+    }
+    protected void saveButton_Click(object sender, EventArgs e)
+    {
+      
+        GridView2.Visible = false;
+        GridView1.Visible = true;
+        if (insertButton.Text == "Save")
+        {
+            AddNewRowToGrid();
+        }
+        else
+        {      TransactionAccEntity oTransactionAccEntity = new TransactionAccEntity();
+                oTransactionAccEntity.VoucherNo = voucherNoTextBox.Text;
+                oTransactionAccEntity.LastModifiedBy = DateTime.Now.ToShortDateString();
+                oTransactionAccEntity.CreateBy = DateTime.Now.ToShortDateString();
+                oTransactionAccEntity.BQty = 0;
+                oTransactionAccEntity.Balance = 0;
+                oTransactionAccEntity.CoAccNo = accountNoDropDownList.SelectedValue;
+                oTransactionAccEntity.IsClient =clintRadioButton.Checked;
+                oTransactionAccEntity.TMode = transModeDropDownList.SelectedItem.Text;
+
+            
+                oTransactionAccEntity.Tref = "";
+                
+           
+            //for (int i = 0; i < GridView1.Rows.Count; i++)
+            //{
+
+              if (transModeDropDownList.SelectedItem.Text == "Bank")
+                {
+                    try
+                    {
+                       oTransactionAccEntity.BankName = bankDropDownList.SelectedItem.Text;
+                    }
+                    catch { oTransactionAccEntity.BankName = ""; }
+                    try
+                    {
+                        oTransactionAccEntity.BranchName = branchDropDownList.SelectedItem.Text;
+                    }
+                    catch { oTransactionAccEntity.BranchName = ""; }
+                    oTransactionAccEntity.ChequeNo = chequeNoTextBox.Text;
+                    try
+                    {
+                        oTransactionAccEntity.ChequeDate = DateTime.ParseExact(chequeDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                    }
+                    catch
+                    {
+                        oTransactionAccEntity.ChequeDate = DateTime.ParseExact(voucherDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        
+                    }
+
+                    oTransactionAccEntity.BankAccNo = bankAccNoTextBox.Text;
+                    if (entryTypeDropDownList.SelectedItem.Text == "Payment" && clintRadioButton.Checked)
+                    {
+                        if (bankAccNoTextBox.Text == "")
+                        {
+                            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please enter an Account No')", true);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                  oTransactionAccEntity.BankName = "";
+                   oTransactionAccEntity.BranchName = "";
+                   oTransactionAccEntity.ChequeNo = "";
+                   oTransactionAccEntity.ChequeDate = DateTime.ParseExact(voucherDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                     
+                  
+                 oTransactionAccEntity.BankAccNo = "";
+                }
+                if (tranTypeDropDownList.SelectedItem.Text == "Debit")
+                {
+                  oTransactionAccEntity.Debit =decimal.Parse(amountTextBox.Text);
+                  oTransactionAccEntity.Credit = 0;
+                }
+                else
+                {
+                    oTransactionAccEntity.Credit = decimal.Parse(amountTextBox.Text);
+                    oTransactionAccEntity.Debit = 0;
+                    
+                }
+                if (clintRadioButton.Checked == true)
+                    oTransactionAccEntity.IsClient = true;
+                else
+                    oTransactionAccEntity.IsClient = false;
+
+                try
+                {
+
+                    oTransactionAccEntity.ChequeDate = DateTime.ParseExact(chequeDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                }
+                catch
+                {
+
+                    oTransactionAccEntity.ChequeDate = DateTime.ParseExact(voucherDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+
+
+                }
+
+                if (oTransactionAccEntity.ChequeDate == DateTime.ParseExact(voucherDateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture))
+                {
+                    oTransactionAccEntity.Matured = true;
+                }
+                else
+                {
+                    oTransactionAccEntity.Matured = false;
+                }
+             
+                //int l = oTransactionAccountDAO.InsertTransactionAcc(oTransactionAccEntity);  
+
+                // }  ConnectionDatabase oConnectionDatabase = new ConnectionDatabase();
+                SqlConnection con;
+                SqlCommand cmd;
+                ConnectionDatabase oConnectionDatabase = new ConnectionDatabase();
+                con = oConnectionDatabase.DatabaseConnection();
+                SqlTransaction oSqlTransaction;
+                oSqlTransaction = con.BeginTransaction("s");
+                int k= oTransactionAccountDAO.InsertTransactionAcc(oTransactionAccEntity, oSqlTransaction, con);
+                string message = "";
+                if (k == 1)
+                {
+                    oSqlTransaction.Commit();
+                    message = "Data Inserted Successfully!";
+                }
+                else
+                {
+                    oSqlTransaction.Rollback();
+                    message = "Data not Inserted!";
+                }
+                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+              searchButton_Click(sender, e);
+        }
+        if (GridView1.Rows.Count > 0)
+        {
+            insertButton.Visible = true;
+            insertButton.Text = "Save";
+        }
+        else
+            insertButton.Visible = false;
+    }
+    protected void createVoucherButton_Click(object sender, EventArgs e)
+    {
+        insertButton.Text = "Save";
+        GridView2.Visible = false;
+        GridView1.Visible = true;
+        string entryType = entryTypeDropDownList.SelectedItem.Text.Substring(0, 1);
+        voucherNoTextBox.Text = oTransactionAccountDAO.CreateNewVoucher(DateTime.Now,entryType);
+        GridView1.DataSource = null;
+    }
+    protected void coaRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        ChartOfAccountDAO oChartOfAccountDAO = new ChartOfAccountDAO();
+        string condition1 = "client";
+        if (coaRadioButton.Checked == true)
+            condition1 = "coa";
+
+        DataTable dt = oChartOfAccountDAO.GetChartOfAccountForDropDown(condition1);
+        accountNoDropDownList.DataSource = dt;
+        accountNoDropDownList.DataTextField = "AccInfo";
+        accountNoDropDownList.DataValueField = "CoAccNo";
+        accountNoDropDownList.DataBind();
+    }
+    protected void clintRadioButton_CheckedChanged(object sender, EventArgs e)
+    {
+        ChartOfAccountDAO oChartOfAccountDAO = new ChartOfAccountDAO();
+        string condition1 = "client";
+        if (coaRadioButton.Checked == true)
+            condition1 = "coa";
+
+        DataTable dt = oChartOfAccountDAO.GetChartOfAccountForDropDown(condition1);
+        accountNoDropDownList.DataSource = dt;
+        accountNoDropDownList.DataTextField = "AccInfo";
+        accountNoDropDownList.DataValueField = "CoAccNo";
+        accountNoDropDownList.DataBind();
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+     
+        string AccountNo = GridView1.DataKeys[e.RowIndex].Value.ToString();
+      
+        DataTable dtCurrentTable = (DataTable)ViewState["CurrentTable"];
+
+        for (int i = 0; i <dtCurrentTable.Rows.Count; i++)
+        {
+            if (AccountNo == dtCurrentTable.Rows[i]["CoAccNo"].ToString())
+            {
+                dtCurrentTable.Rows[i].Delete();
+            
+            }
+
+        
+        }
+
+        GridView1.DataSource = dtCurrentTable;
+
+        GridView1.DataBind();
+        if (GridView1.Rows.Count > 0)
+        {
+            insertButton.Visible = true;
+        }
+        else
+            insertButton.Visible = false;
+
+
+    }
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            Label CreditLabel = (Label)e.Row.FindControl("CreditLabel");
+            Label DebitLabel = (Label)e.Row.FindControl("DebitLabel");
+
+            decimal CAmount = Decimal.Parse(CreditLabel.Text);
+            decimal DAmount = Decimal.Parse(DebitLabel.Text);
+            creditAmount += CAmount;
+            debitAmount += DAmount;
+        
+          
+        }
+
+        if (e.Row.RowType == DataControlRowType.Footer)
+        {
+            Label creditTotalLabel = (Label)e.Row.FindControl("creditTotalLabel");
+            Label debitTotalLabel = (Label)e.Row.FindControl("debitTotalLabel");
+
+            creditTotalLabel.Text = creditAmount.ToString();
+            debitTotalLabel.Text = debitAmount.ToString();
+
+            
+        } 
+    }
+    private void SetInitialRow()
+    {
+
+        DataTable dt = new DataTable();
+
+        DataRow dr = null;
+        dt.Columns.Add("TranAccSL", typeof(string));
+        dt.Columns.Add("VoucherNo", typeof(string));
+        dt.Columns.Add("CoAccNo", typeof(string));
+        dt.Columns.Add("TMode", typeof(string));
+        //dt.Columns.Add("TransModeID", typeof(string));
+        //dt.Columns.Add("BankID", typeof(string));
+        //dt.Columns.Add("BranchID", typeof(string));
+        dt.Columns.Add("BankName", typeof(string));
+        dt.Columns.Add("BranchName", typeof(string));
+        dt.Columns.Add("ChequeNo", typeof(string));
+        dt.Columns.Add("ChequeDate", typeof(string));
+        dt.Columns.Add("Debit", typeof(string));
+        dt.Columns.Add("Credit", typeof(string));
+        dt.Columns.Add("IsClient", typeof(string));
+        dt.Columns.Add("BankAccNo", typeof(string));
+        dr = dt.NewRow();
+        dr["TranAccSL"] = "";
+        dr["VoucherNo"] = "";
+        dr["CoAccNo"] = "";
+        dr["TMode"] = "";
+        dr["BankName"] = "";
+        dr["BranchName"] = "";
+        //dr["TransModeID"] = "";
+        //dr["BankID"] = "";
+        //dr["BranchID"] = "";
+        dr["ChequeNo"] = "";
+        dr["ChequeDate"] = "";
+        dr["Debit"] = "0";
+        dr["Credit"] = "0";
+        dr["IsClient"] = "";
+        dr["BankAccNo"] = "";
+        //dr["RowNumber"] = 1;
+        dt.Rows.Add(dr);
+
+        //dr = dt.NewRow();
+
+
+
+        //Store the DataTable in ViewState
+
+        ViewState["CurrentTable"] = dt;
+
+
+
+        GridView1.DataSource = null;
+
+        GridView1.DataBind();
+
+    }
+    private void AddNewRowToGrid()
+    {
+
+        int rowIndex = 0;
+
+
+
+        if (ViewState["CurrentTable"] != null)
+        {
+
+            DataTable dtCurrentTable = (DataTable)ViewState["CurrentTable"];
+
+            DataRow dtRow = null;
+
+            if (dtCurrentTable.Rows.Count > 0)
+            {
+
+                for (int i = 0; i < dtCurrentTable.Rows.Count; i++)
+                {
+
+                   
+                    dtRow = dtCurrentTable.NewRow();
+
+                    dtRow["TranAccSL"] = i + 1;
+                    dtRow["VoucherNo"] = voucherNoTextBox.Text;
+                    dtRow["CoAccNo"] = accountNoDropDownList.SelectedValue;
+                    dtRow["TMode"] = transModeDropDownList.SelectedItem.Text;
+                    if (transModeDropDownList.SelectedItem.Text == "Bank")
+                    {
+                        try
+                        {
+                            dtRow["BankName"] = bankDropDownList.SelectedItem.Text;
+                        }
+                        catch { dtRow["BankName"] = ""; }
+                       try{
+                        dtRow["BranchName"] = branchDropDownList.SelectedItem.Text;}
+                        catch{dtRow["BranchName"]="" ;}
+                        dtRow["ChequeNo"] = chequeNoTextBox.Text;
+                        dtRow["ChequeDate"] = chequeDateTextBox.Text;
+                        //dtRow["TransModeID"] = transModeDropDownList.SelectedValue;
+                        //try{
+                        //dtRow["BankID"] =bankDropDownList.SelectedValue;}
+                        //catch{dtRow["BankID"]="";}
+                        //try{
+                        //dtRow["BranchID"] = branchDropDownList.SelectedValue;}
+                        //catch{dtRow["BranchID"]="";}
+                        dtRow["BankAccNo"] = bankAccNoTextBox.Text;
+                        if (entryTypeDropDownList.SelectedItem.Text == "Payment"&&clintRadioButton.Checked)
+                        {
+                            if (bankAccNoTextBox.Text == "")
+                            {
+                                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please enter an Account No')", true);
+                                return;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        dtRow["BankName"] = "";
+                        dtRow["BranchName"] = "";
+                        dtRow["ChequeNo"] = "";
+                        dtRow["ChequeDate"] = "";
+                        //dtRow["TransModeID"] = "";
+                        //dtRow["BankID"] = "";
+                        //dtRow["BranchID"] = "";
+                        dtRow["BankAccNo"] = "";
+                    }
+                    if (tranTypeDropDownList.SelectedItem.Text == "Debit")
+                    {
+                        dtRow["Debit"] = amountTextBox.Text;
+                        dtRow["Credit"] = "0";
+                    }
+                    else
+                    {
+                        dtRow["Debit"] = "0";
+                        dtRow["Credit"] = amountTextBox.Text;
+                    }
+
+                    if(clintRadioButton.Checked==true)
+                        dtRow["IsClient"] = true;
+                    else
+                        dtRow["IsClient"] = false;
+
+               
+
+                    rowIndex++;
+
+                }
+
+                dtCurrentTable.Rows.Add(dtRow);
+
+                ViewState["CurrentTable"] = dtCurrentTable;
+                DataTable dt = new DataTable();
+                if (dtCurrentTable.Rows[0]["VoucherNo"].ToString() == "")
+                    dtCurrentTable.Rows[0].Delete();
+                GridView1.DataSource = dtCurrentTable;
+
+                GridView1.DataBind();
+
+            }
+            else
+            {
+                dtRow = dtCurrentTable.NewRow();
+
+                dtRow["TranAccSL"] = 1;
+                dtRow["VoucherNo"] = voucherNoTextBox.Text;
+                dtRow["CoAccNo"] = accountNoDropDownList.SelectedValue;
+                dtRow["TMode"] = transModeDropDownList.SelectedItem.Text;
+                if (transModeDropDownList.SelectedItem.Text == "Bank")
+                {
+                    try
+                    {
+                        dtRow["BankName"] = bankDropDownList.SelectedItem.Text;
+                    }
+                    catch { dtRow["BankName"] = ""; }
+                    try
+                    {
+                        dtRow["BranchName"] = branchDropDownList.SelectedItem.Text;
+                    }
+                    catch { dtRow["BranchName"] = ""; }
+                    dtRow["ChequeNo"] = chequeNoTextBox.Text;
+                    dtRow["ChequeDate"] = chequeDateTextBox.Text;
+                    //dtRow["TransModeID"] = transModeDropDownList.SelectedValue;
+                    //try
+                    //{
+                    //    dtRow["BankID"] = bankDropDownList.SelectedValue;
+                    //}
+                    //catch { dtRow["BankID"] = ""; }
+                    //try
+                    //{
+                    //    dtRow["BranchID"] = branchDropDownList.SelectedValue;
+                    //}
+                    //catch { dtRow["BranchID"] = ""; }
+                    dtRow["BankAccNo"] = bankAccNoTextBox.Text;
+                    if (entryTypeDropDownList.SelectedItem.Text == "Payment" && clintRadioButton.Checked)
+                    {
+                        if (bankAccNoTextBox.Text == "")
+                        {
+                            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please enter an Account No')", true);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    dtRow["BankName"] = "";
+                    dtRow["BranchName"] = "";
+                    dtRow["ChequeNo"] = "";
+                    dtRow["ChequeDate"] = "";
+                    //dtRow["TransModeID"] = "";
+                    //dtRow["BankID"] = "";
+                    //dtRow["BranchID"] = "";
+                    dtRow["BankAccNo"] = "";
+                }
+                if (tranTypeDropDownList.SelectedItem.Text == "Debit")
+                {
+                    dtRow["Debit"] = amountTextBox.Text;
+                    dtRow["Credit"] = "0";
+                }
+                else
+                {
+                    dtRow["Debit"] = "0";
+                    dtRow["Credit"] = amountTextBox.Text;
+                }
+                if (clintRadioButton.Checked == true)
+                    dtRow["IsClient"] = true;
+                else
+                    dtRow["IsClient"] = false;
+                dtCurrentTable.Rows.Add(dtRow);
+
+                ViewState["CurrentTable"] = dtCurrentTable;
+                DataTable dt = new DataTable();
+                if (dtCurrentTable.Rows[0]["VoucherNo"].ToString() == "")
+                    dtCurrentTable.Rows[0].Delete();
+                GridView1.DataSource = dtCurrentTable;
+
+                GridView1.DataBind();
+            }
+
+        }
+
+        else
+        {
+
+            Response.Write("ViewState is null");
+
+        }
+
+
+
+    }
+    protected void GridView1_RowCreated(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.Footer)
+        {
+            foreach (TableCell cell in e.Row.Cells)
+            {
+                cell.BorderStyle = BorderStyle.None;
+            }
+           
+        }
+    }
+    protected void insertButton_Click(object sender, EventArgs e)
+    {
+        if (insertButton.Text == "Update")
+        {
+            decimal dAmount = 0;
+            decimal cAmount = 0;
+
+            for (int i = 0; i < GridView2.Rows.Count;i++ )
+            {
+
+                dAmount += Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("DebitTextBox")).Text);
+                cAmount += Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("CreditTextBox")).Text);
+            }
+
+            if (dAmount != cAmount)
+            {
+                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Debit & Credit Amount Not Same!')", true);
+                return;
+            }
+            else if (dAmount == 0 && cAmount == 0)
+            {
+                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Debit & Credit Amount are 0!')", true);
+                return;
+            }
+            else
+            {int l=0;
+                for (int i = 0; i < GridView2.Rows.Count; i++)
+                {
+                    TransactionAccEntity oTransactionAccEntity = new TransactionAccEntity();
+                    dAmount = 0;
+                    cAmount = 0;
+                    dAmount= Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("DebitTextBox")).Text);
+                    cAmount = Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("CreditTextBox")).Text);
+                    string accountNo = ((Label)GridView2.Rows[i].FindControl("COALabel")).Text;
+                    string voucherNo = ((Label)GridView2.Rows[i].FindControl("VoucherNoLabel")).Text;
+                    oTransactionAccEntity.Debit = dAmount;
+                    oTransactionAccEntity.Credit = cAmount;
+                    oTransactionAccEntity.CoAccNo = accountNo;
+                    oTransactionAccEntity.VoucherNo = voucherNo;
+                    l += oTransactionAccountDAO.UpdateTransactionAccDetails(oTransactionAccEntity);
+
+                }
+                string message = "";
+                if (GridView2.Rows.Count == l)
+                {
+                    message = "Data Updated successfully!";
+                }
+                else
+                {
+                    message = "Data not Updated.";
+                }
+                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('"+message+"')", true);
+            }
+
+        }
+        else{
+        Label creditTotalLabel = (Label)GridView1.FooterRow.FindControl("creditTotalLabel");
+        Label debitTotalLabel = (Label)GridView1.FooterRow.FindControl("debitTotalLabel");
+        decimal totalCreditAmount = decimal.Parse(creditTotalLabel.Text);
+        decimal totalDebitAmount = decimal.Parse(debitTotalLabel.Text);
+        if (totalCreditAmount != totalDebitAmount)
+        {
+            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Debit & Credit Amount Not Same!')", true);
+            return;
+        }
+        else if (totalCreditAmount == 0 && totalDebitAmount == 0)
+        {
+            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Debit & Credit Amount both are 0')", true);
+            return;
+        }
+
+        TransactionEntity oTransactionEntity = new TransactionEntity();
+        oTransactionEntity.VoucherNo = voucherNoTextBox.Text;
+        oTransactionEntity.VoucherDate = DateTime.ParseExact(voucherDateTextBox.Text, "dd/MM/yyyy", CultureInfo.CurrentUICulture);
+        oTransactionEntity.TranTypeSL = int.Parse(entryTypeDropDownList.SelectedValue.ToString());
+        oTransactionEntity.RevTranSL = 0;
+        oTransactionEntity.Posted = false;
+        oTransactionEntity.PartiCulars = particularsTextBox.Text;
+        oTransactionEntity.Approved = false;
+        oTransactionEntity.BillSL = 0;
+        oTransactionEntity.BrSL = 0;
+        oTransactionEntity.CreateBy = DateTime.Now.ToShortDateString();
+        oTransactionEntity.LastModifiedBy = DateTime.Now.ToShortDateString();
+        //int k = oTransactionAccountDAO.InsertTransaction(oTransactionEntity);
+
+        
+         List<TransactionAccEntity> oTransactionAccEntityList = new List<TransactionAccEntity>();
+         //if (k == 1)
+         //{
+             for (int i = 0; i < GridView1.Rows.Count; i++)
+             {
+                 TransactionAccEntity oTransactionAccEntity = new TransactionAccEntity();
+                 oTransactionAccEntity.VoucherNo = voucherNoTextBox.Text;
+                 oTransactionAccEntity.LastModifiedBy = DateTime.Now.ToShortDateString();
+                 oTransactionAccEntity.CreateBy = DateTime.Now.ToShortDateString();
+                 oTransactionAccEntity.BQty = 0;
+                 oTransactionAccEntity.Balance = 0;
+                 oTransactionAccEntity.CoAccNo = ((Label)GridView1.Rows[i].FindControl("AccountNoLabel")).Text;
+                 oTransactionAccEntity.Credit = Convert.ToDecimal(((Label)GridView1.Rows[i].FindControl("CreditLabel")).Text);
+                 oTransactionAccEntity.Debit = Convert.ToDecimal(((Label)GridView1.Rows[i].FindControl("DebitLabel")).Text);
+                 oTransactionAccEntity.IsClient = Convert.ToBoolean(((Label)GridView1.Rows[i].FindControl("IsClientLabel")).Text);
+                 oTransactionAccEntity.TMode = ((Label)GridView1.Rows[i].FindControl("TransModeLabel")).Text;
+                 
+                 oTransactionAccEntity.BankName = ((Label)GridView1.Rows[i].FindControl("BankNameLabel")).Text;
+                 oTransactionAccEntity.BranchName = ((Label)GridView1.Rows[i].FindControl("BranchNameLabel")).Text;
+                 oTransactionAccEntity.ChequeNo = ((Label)GridView1.Rows[i].FindControl("ChequeNoLabel")).Text;
+                 oTransactionAccEntity.BankAccNo = ((Label)GridView1.Rows[i].FindControl("BankAccNoLabel")).Text;
+                 oTransactionAccEntity.Tref = "";
+                 try
+                 {
+                    
+                     oTransactionAccEntity.ChequeDate = DateTime.ParseExact(((Label)GridView1.Rows[i].FindControl("ChequeDateLabel")).Text, "dd/MM/yyyy", CultureInfo.CreateSpecificCulture("en-US")); 
+                 }
+                 catch
+                 {
+                    
+                         oTransactionAccEntity.ChequeDate = oTransactionEntity.VoucherDate;
+                    
+                 }
+
+                 if (oTransactionAccEntity.ChequeDate == oTransactionEntity.VoucherDate)
+                 {
+                     oTransactionAccEntity.Matured = true;
+                 }
+                 else
+                 {
+                     oTransactionAccEntity.Matured = false;
+                 }
+                 oTransactionAccEntityList.Add(oTransactionAccEntity);
+                 //int l = oTransactionAccountDAO.InsertTransactionAcc(oTransactionAccEntity);  
+
+             }
+             int k = oTransactionAccountDAO.InsertTransaction(oTransactionEntity, oTransactionAccEntityList);
+             string message = "";
+             if (k == 1)
+             {
+                 message = "Data Inserted Successfully!";
+             }
+             else
+             {
+                 message = "Data not Inserted!";
+             }
+             ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('"+message+"')", true);
+            searchButton_Click(sender,e);
+           
+         }
+
+
+    }
+    protected void searchButton_Click(object sender, EventArgs e)
+    {
+        GridView2.Visible = true;
+        GridView1.Visible = false;
+        string voucherNo = voucherNoTextBox.Text.ToUpper();
+        string condition = " where tblTransactionAcc.VoucherNo='" + voucherNo + "' and Approved='False'";
+        DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+        GridView2.DataSource = dt;
+        GridView2.DataBind();
+        if (GridView2.Rows.Count > 0)
+        {
+            insertButton.Visible = true;
+            insertButton.Text = "Update";
+        }
+
+    }
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        GridView1.EditIndex = e.NewEditIndex;
+        //gridViewBind();
+        //string voucherNo = voucherNoTextBox.Text.ToUpper();
+        //string condition = " where tblTransactionAcc.VoucherNo='" + voucherNo + "' and Approved='False'";
+        //DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+        //GridView1.DataSource = dt;
+        //GridView1.DataBind();
+    }
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        string voucherNo = voucherNoTextBox.Text.ToUpper();
+        string condition = " where tblTransactionAcc.VoucherNo='" + voucherNo + "' and Approved='False'";
+        DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    protected void GridView2_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+        GridView2.EditIndex = -1;
+        string voucherNo = ((Label)GridView2.Rows[0].FindControl("VoucherNoLabel")).Text;
+        string condition = " where tblTransactionAcc.VoucherNo='" + voucherNo + "' and Approved='False'";
+        DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+        GridView2.DataSource = dt;
+        GridView2.DataBind();
+    }
+    protected void GridView2_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        GridView2.EditIndex = e.NewEditIndex;
+        string voucherNo= ((Label)GridView2.Rows[0].FindControl("VoucherNoLabel")).Text;
+        string condition = " where tblTransactionAcc.VoucherNo='" + voucherNo + "' and Approved='False'";
+        DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+        GridView2.DataSource = dt;
+        GridView2.DataBind();
+    }
+    protected void GridView2_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+    }
+    protected void GridView2_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        TransactionAccEntity oTransactionAccEntity = new TransactionAccEntity();
+        oTransactionAccEntity.CoAccNo = ((Label)GridView2.Rows[e.RowIndex].FindControl("COALabel")).Text;
+        oTransactionAccEntity.VoucherNo = ((Label)GridView2.Rows[e.RowIndex].FindControl("VoucherNoLabel")).Text;
+        int i = oTransactionAccountDAO.DeleteTransactionAccDetails(oTransactionAccEntity);
+        string message = "";
+        if (i == 1)
+        {
+            message = "Data Deleted Successfully!";
+        }
+        else
+        {
+            message = "Data not Deleted!";
+        }
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        searchButton_Click(sender, e);
+
+    }
+
+    protected void GridView2_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        //creditAmount = 0;
+        //debitAmount = 0;
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            TextBox CreditLabel = (TextBox)e.Row.FindControl("CreditTextBox");
+            TextBox DebitLabel = (TextBox)e.Row.FindControl("DebitTextBox");
+            decimal CAmount = 0;
+            decimal DAmount = 0;
+            try
+            {
+                CAmount = Decimal.Parse(CreditLabel.Text == null ? "0" : CreditLabel.Text);
+                DAmount = Decimal.Parse(DebitLabel.Text == null ? "0" : DebitLabel.Text);
+            }
+            catch
+            {
+
+            }
+            creditAmount += CAmount;
+            debitAmount += DAmount;
+
+
+        }
+        if (e.Row.RowType == DataControlRowType.Footer)
+        {
+            Label creditTotalLabel = (Label)e.Row.FindControl("creditTotalLabel");
+            Label debitTotalLabel = (Label)e.Row.FindControl("debitTotalLabel");
+
+            creditTotalLabel.Text = creditAmount.ToString();
+            debitTotalLabel.Text = debitAmount.ToString();
+
+
+        } 
+ 
+    }
+    protected void GridView2_RowCreated(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            TextBox CreditLabel = (TextBox)e.Row.FindControl("CreditTextBox");
+            TextBox DebitLabel = (TextBox)e.Row.FindControl("DebitTextBox");
+            decimal CAmount = 0;
+            decimal DAmount = 0;
+            try
+            {
+                CAmount = Decimal.Parse(CreditLabel.Text == null ? "0" : CreditLabel.Text);
+                DAmount = Decimal.Parse(DebitLabel.Text == null ? "0" : DebitLabel.Text);
+            }
+            catch
+            {
+
+            }
+            creditAmount += CAmount;
+            debitAmount += DAmount;
+
+
+        }
+        if (e.Row.RowType == DataControlRowType.Footer)
+        {
+            Label creditTotalLabel = (Label)e.Row.FindControl("creditTotalLabel");
+            Label debitTotalLabel = (Label)e.Row.FindControl("debitTotalLabel");
+
+            creditTotalLabel.Text = creditAmount.ToString();
+            debitTotalLabel.Text = debitAmount.ToString();
+
+
+        } 
+    }
+    protected void CreditTextBox_TextChanged(object sender, EventArgs e)
+    {
+        decimal cAmount = 0;
+        decimal dAmount = 0;
+        for (int i = 0; i < GridView2.Rows.Count; i++)
+        {
+            try
+            {
+                dAmount += Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("DebitTextBox")).Text);
+                cAmount += Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("CreditTextBox")).Text);
+            }
+            catch { }
+        }
+
+
+        Label creditTotalLabel = (Label)GridView2.FooterRow.FindControl("creditTotalLabel");
+        Label debitTotalLabel = (Label)GridView2.FooterRow.FindControl("debitTotalLabel");
+
+            creditTotalLabel.Text = cAmount.ToString();
+            debitTotalLabel.Text = dAmount.ToString();
+
+
+      
+
+    }
+    protected void DebitTextBox_TextChanged(object sender, EventArgs e)
+    {
+        decimal cAmount = 0;
+        decimal dAmount = 0;
+        for (int i = 0; i < GridView2.Rows.Count; i++)
+        {
+            try
+            {
+                dAmount += Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("DebitTextBox")).Text);
+                cAmount += Convert.ToDecimal(((TextBox)GridView2.Rows[i].FindControl("CreditTextBox")).Text);
+            }
+            catch { }
+        }
+
+
+        Label creditTotalLabel = (Label)GridView2.FooterRow.FindControl("creditTotalLabel");
+        Label debitTotalLabel = (Label)GridView2.FooterRow.FindControl("debitTotalLabel");
+
+        creditTotalLabel.Text = cAmount.ToString();
+        debitTotalLabel.Text = dAmount.ToString();
+
+
+    }
+}

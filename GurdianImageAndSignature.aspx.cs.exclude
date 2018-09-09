@@ -1,0 +1,302 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.IO;
+
+
+public partial class GurdianImageAndSignature : System.Web.UI.Page
+{
+   
+     //ClientDAO oClientDAO = new ClientDAO();
+    NomineeDAO oNomineeDAO = new NomineeDAO();
+    GuardianDAO oGuardianDAO = new GuardianDAO();
+    ImageAndSignatureDAO oImageAndSignatureDAO = new ImageAndSignatureDAO();
+    
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            imagebindGrid();
+            loadGuardianDropDownLit();
+            loadNomineeDropDownLit();
+
+        }
+    }
+    private void loadGuardianDropDownLit()
+    {
+        //if (GuardianDropDownList.SelectedValue == "" || GuardianDropDownList.SelectedValue == null)
+        //    return;
+        //string condition = " where GuardianID='" + GuardianDropDownList.SelectedValue + "'";
+      
+        DataTable  dt = oGuardianDAO.GetGuardian("");
+
+        GuardianDropDownList.DataSource = dt;
+        GuardianDropDownList.DataTextField = "GuardianID";
+        GuardianDropDownList.DataValueField = "GuardianID";
+        GuardianDropDownList.DataBind();
+        imagebindGrid();
+    }
+    private void loadNomineeDropDownLit()
+    {
+        //if (NomineeDropDownList.SelectedValue == "" || NomineeDropDownList.SelectedValue == null)
+        //    return;
+        //string condition = " where NomineeID='" + NomineeDropDownList.SelectedValue + "'";
+        DataTable dt = oNomineeDAO.GetNominee("");
+
+        NomineeDropDownList.DataSource = dt;
+        NomineeDropDownList.DataTextField = "NomineeID";
+        NomineeDropDownList.DataValueField = "NomineeID";
+        NomineeDropDownList.DataBind();
+        imagebindGrid();
+    }
+
+    private void imagebindGrid()
+    {
+        if (GuardianDropDownList.SelectedValue == "" || GuardianDropDownList.SelectedValue == null)
+            return;
+        DataTable dt = new DataTable();
+        string condition = " where GuardianID=" + GuardianDropDownList.SelectedValue + "";
+        dt = oImageAndSignatureDAO.GetGuardianImageAndSignature(condition);
+        if (dt.Rows.Count > 0)
+        {
+            //Image1..ImageUrl ="Handler1.ashx?id_Image="+ dt.Rows[0]["ID"].ToString();
+            Gridview1.DataSource = dt;
+            Gridview1.DataBind();
+            //btnimguplod.Text = "Update";
+            btnimguplod.Visible = false;
+            Button1.Visible = true;
+        }
+        else
+        {
+            btnimguplod.Visible = true;
+            Button1.Visible = false;
+            Gridview1.DataSource = dt;
+            Gridview1.DataBind();
+        }
+    }
+    protected void upload(object sender, EventArgs e)
+    {
+        //Imageupload();
+        Imageupload();
+    }
+    protected void clientDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        loadNomineeDropDownLit();
+    }
+    protected void nomineeDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        imagebindGrid();
+    }
+    private void Imageupload()
+    {
+        if (NomineeDropDownList.SelectedValue == "" || NomineeDropDownList.SelectedValue == null)
+            return;
+        if (FileUpload1.HasFile)
+        {
+
+            int imagefilelenth = FileUpload1.PostedFile.ContentLength;
+            string fname = FileUpload1.FileName;
+            string fext = Path.GetExtension(fname);
+            fext = fext.ToLower();
+            int k = CheckFileSize(imagefilelenth, fext);
+            if (k == 0)
+                return;
+
+            byte[] imgarray = new byte[imagefilelenth];
+
+            HttpPostedFile image = FileUpload1.PostedFile;
+            image.InputStream.Read(imgarray, 0, imagefilelenth);
+
+
+            string filepath = Server.MapPath("~/image/signatureimages.png");
+            System.IO.FileInfo fi = new System.IO.FileInfo(filepath);
+            int signaturefilelenth = (int)fi.Length;
+            byte[] signaturearray = new byte[signaturefilelenth];
+
+            if (FileUpload2.HasFile)
+            {
+                fname = FileUpload2.FileName;
+                fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+
+                signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+                int j = CheckFileSize(signaturefilelenth, fext);
+                if (j == 0)
+                    return;
+
+                signaturearray = new byte[signaturefilelenth];
+
+                HttpPostedFile signature = FileUpload2.PostedFile;
+                signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+
+
+
+
+
+            }
+            int i = oImageAndSignatureDAO.InsertGuardianImageAndSignature(imgarray, signaturearray, GuardianDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), DateTime.Now.ToShortDateString(), NomineeDropDownList.SelectedValue.ToString());
+            imagebindGrid();
+
+
+
+
+
+        }
+        else if (FileUpload2.HasFile)
+        {
+            int signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+            byte[] signaturearray = new byte[signaturefilelenth];
+
+            HttpPostedFile signature = FileUpload2.PostedFile;
+            signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+            string fname = FileUpload2.FileName;
+            string fext = Path.GetExtension(fname);
+            fext = fext.ToLower();
+            int j = CheckFileSize(signaturefilelenth, fext);
+            if (j == 0)
+                return;
+            string filepath = Server.MapPath("~/image/blankimages.jpg");
+            System.IO.FileInfo fi = new System.IO.FileInfo(filepath);
+            int imagefilelenth = (int)fi.Length;
+            byte[] imgarray = new byte[signaturefilelenth];
+            fname = FileUpload1.FileName;
+            fext = Path.GetExtension(fname);
+            fext = fext.ToLower();
+            if (FileUpload1.HasFile)
+            {
+                imagefilelenth = FileUpload1.PostedFile.ContentLength;
+                imgarray = new byte[imagefilelenth];
+                int k = CheckFileSize(imagefilelenth, fext);
+                if (k == 0)
+                    return;
+                HttpPostedFile image = FileUpload1.PostedFile;
+                image.InputStream.Read(imgarray, 0, imagefilelenth);
+            }
+            int i = oImageAndSignatureDAO.InsertGuardianImageAndSignature(imgarray, signaturearray, GuardianDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), DateTime.Now.ToShortDateString(), NomineeDropDownList.SelectedValue.ToString());
+            imagebindGrid();
+        }
+
+
+
+    }
+
+    private int CheckFileSize(int imagefilelenth, string fext)
+    {
+        int i = 0;
+        if (imagefilelenth < 102400)
+        {
+            if (fext == ".jpg" || fext == ".png" || fext == ".gif" || fext == ".bmp")
+            { i = 1; }
+            else
+            { Response.Write("<script>alert('Only image files are allowed');</script>"); }
+        }
+        else
+        { Response.Write("<script>alert('Max file size allowed is 100 KB');</script>"); }
+        return i;
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        if (GuardianDropDownList.SelectedValue == "" || GuardianDropDownList.SelectedValue == null)
+            return;
+        string confirmValue = Request.Form["confirm_value"];
+        if (confirmValue == "Yes")
+        {
+            string condition = " where  NomineeID=" + GuardianDropDownList.SelectedValue + "";
+            DataTable dt = oImageAndSignatureDAO.GetGuardianImageAndSignature(condition);
+
+
+            if (FileUpload1.HasFile)
+            {
+
+                int imagefilelenth = FileUpload1.PostedFile.ContentLength;
+                string fname = FileUpload1.FileName;
+                string fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+                int k = CheckFileSize(imagefilelenth, fext);
+                if (k == 0)
+                    return;
+
+                byte[] imgarray = new byte[imagefilelenth];
+
+                HttpPostedFile image = FileUpload1.PostedFile;
+                image.InputStream.Read(imgarray, 0, imagefilelenth);
+
+
+                byte[] signaturearray = (byte[])dt.Rows[0]["NomineeSignature"];
+
+                if (FileUpload2.HasFile)
+                {
+                    fname = FileUpload2.FileName;
+                    fext = Path.GetExtension(fname);
+                    fext = fext.ToLower();
+
+                    int signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+                    int j = CheckFileSize(signaturefilelenth, fext);
+                    if (j == 0)
+                        return;
+
+                    signaturearray = new byte[signaturefilelenth];
+
+                    HttpPostedFile signature = FileUpload2.PostedFile;
+                    signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+
+
+
+
+
+                }
+                int n = oImageAndSignatureDAO.InsertGuardianImageAndSignatureHistory(imgarray, signaturearray, GuardianDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), NomineeDropDownList.SelectedValue.ToString());
+                int i = oImageAndSignatureDAO.UpdateGuardianImageAndSignature(imgarray, signaturearray, GuardianDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), NomineeDropDownList.SelectedValue.ToString());
+                imagebindGrid();
+
+
+
+
+
+            }
+            else if (FileUpload2.HasFile)
+            {
+                int signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+                byte[] signaturearray = new byte[signaturefilelenth];
+
+                HttpPostedFile signature = FileUpload2.PostedFile;
+                signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+                string fname = FileUpload2.FileName;
+                string fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+                int j = CheckFileSize(signaturefilelenth, fext);
+                if (j == 0)
+                    return;
+                byte[] imgarray = (byte[])dt.Rows[0]["NomineeImage"];
+                fname = FileUpload1.FileName;
+                fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+                if (FileUpload1.HasFile)
+                {
+                    int imagefilelenth = FileUpload1.PostedFile.ContentLength;
+                    imgarray = new byte[imagefilelenth];
+                    int k = CheckFileSize(imagefilelenth, fext);
+                    if (k == 0)
+                        return;
+                    HttpPostedFile image = FileUpload1.PostedFile;
+                    image.InputStream.Read(imgarray, 0, imagefilelenth);
+                }
+                int n = oImageAndSignatureDAO.InsertGuardianImageAndSignatureHistory(imgarray, signaturearray, GuardianDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), NomineeDropDownList.SelectedValue.ToString());
+                int i = oImageAndSignatureDAO.UpdateGuardianImageAndSignature(imgarray, signaturearray, GuardianDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), NomineeDropDownList.SelectedValue.ToString());
+                imagebindGrid();
+            }
+        }
+
+
+    }
+
+
+    protected void GuardianDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        imagebindGrid();
+    }
+}

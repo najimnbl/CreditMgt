@@ -1,0 +1,157 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class ChargeCategory : System.Web.UI.Page
+{
+    ChargeCategoryEntity oChargeCategoryEntity = new ChargeCategoryEntity();
+    ChargeInformationDAO oChargeInformationDAO = new ChargeInformationDAO();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            gridViewBind();
+            //dropDownListBind();
+        }
+    }
+
+
+    protected void btnCCSave_Click(object sender, EventArgs e)
+    {
+        oChargeCategoryEntity = new ChargeCategoryEntity();
+        oChargeCategoryEntity.ChargeCategoryCode = txtCCategoryCode.Text.ToUpper();
+        oChargeCategoryEntity.ChargeCategoryName = txtCCategoryName.Text.ToUpper();
+        oChargeCategoryEntity.ChargeCategoryRemarks = txtCCategoryRemarks.Text;
+        oChargeCategoryEntity.ChargeCategoryCreatedBy = "";//session["userId"] needed;
+        oChargeCategoryEntity.ChargeCategoryLastModifiedBy = "";
+
+        string condition = " where ChargeCategoryName='" + oChargeCategoryEntity.ChargeCategoryName + "'";
+        DataTable dt = oChargeInformationDAO.GetChargeCategory(condition);
+        string message = "";
+        if (dt.Rows.Count == 0)
+        {
+            int i = oChargeInformationDAO.InsertChargeCategory(oChargeCategoryEntity);
+            if (i == 1)
+            {
+                message = "Data Inserted Successfully";
+                Clear();
+            }
+            else
+                message = "Data Not Inserted!";
+
+        }
+        else
+        {
+            message = "Branch Alreay in DataBase";
+        }
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+    }
+
+    private void Clear()
+    {
+        txtCCategoryCode.Text = "";
+        txtCCategoryName.Text = "";
+        txtCCategoryRemarks.Text = "";
+    }
+
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        GridView1.PageIndex = e.NewPageIndex;
+        gridViewBind();
+        //GridView1.DataSource = oCollectionAccount.GetCustomer(Session["brCode"].ToString(), "");
+        //GridView1.DataBind();
+
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+        ////int customerId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        ////        //getting row field details
+        TextBox ChargeCategoryNameTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("ChargeCategoryNameTextBox");
+
+        TextBox ChargeCategoryRemarksTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("ChargeCategoryRemarksTextBox");
+        TextBox ChargeAmountTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("ChargeAmountTextBox");
+
+        oChargeCategoryEntity = new ChargeCategoryEntity();
+        oChargeCategoryEntity.ChargeCategoryName = ChargeCategoryNameTextBox.Text.ToUpper();
+        oChargeCategoryEntity.ChargeCategoryRemarks = ChargeCategoryRemarksTextBox.Text;
+        oChargeCategoryEntity.ChargeCategoryLastModifiedBy = ""; //session["userId"] needed;
+        //oChargeItemEntity.ChargeCode = txtChargeCode.Text;
+        oChargeCategoryEntity.ChargeCategoryID = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oChargeInformationDAO.UpdateChargeCategory(oChargeCategoryEntity);
+        string message = "";
+        GridView1.EditIndex = -1;
+
+
+        if (i == 1)
+            message = "Data Updated Successfully";
+        else
+            message = "Data Not Updated!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+        oChargeCategoryEntity = new ChargeCategoryEntity();
+        
+        //oChargeItemEntity.ChargeCode = txtChargeCode.Text;
+        oChargeCategoryEntity.ChargeCategoryID = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oChargeInformationDAO.DeleteChargeCategory(oChargeCategoryEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+            message = "Data Deleted Successfully";
+        else
+            message = "Data Not Deleted!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+
+        // gvbind();
+
+    }
+
+    private void gridViewBind()
+    {
+        oChargeInformationDAO = new ChargeInformationDAO();
+        string condition = " order by ChargeCategoryID desc";
+        DataTable dt = oChargeInformationDAO.GetChargeCategory(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    protected void btnCCNew_Click(object sender, EventArgs e)
+    {
+        Clear();
+    }
+}

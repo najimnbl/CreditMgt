@@ -1,0 +1,280 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+
+public partial class Nominee : System.Web.UI.Page
+{
+    NomineeEntity oNomineeEntity = new  NomineeEntity();
+    NomineeDAO oNomineeDAO = new NomineeDAO();
+    ReturnVal oRtnValue = new ReturnVal();
+    
+    
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        if (!IsPostBack)
+        {
+
+            string NomineeID = oRtnValue.ReturnValue("tblNominee", "", "", "isnull(MAX(NomineeID),0000000)+1");
+            int value;
+            int.TryParse(NomineeID, out value);
+            txtNomineeID.Text = value.ToString("D7");
+
+            LoadDropDownList();
+            gridViewBind();
+        
+        }
+
+    }
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+
+        oNomineeEntity.NomineeID = txtNomineeID.Text;
+        oNomineeEntity.NomineeName = txtNomineename.Text;
+        oNomineeEntity.NomineeFatherName = txtNommineeFaterName.Text;
+        oNomineeEntity.NomineeSex = txtNomineeSex.Text;
+        oNomineeEntity.NomineeReligion = txtReligion.Text;
+        oNomineeEntity.NomineeRelationWithC  = txtRelation .Text;
+
+        oNomineeEntity.NomineeCountryID = Convert.ToInt16(drpCountyID.SelectedValue);
+        Convert.ToInt16(drpCountyID.SelectedValue);
+        oNomineeEntity.NomineeNID = txtNomineeNID.Text;
+        oNomineeEntity.NomineeTIN = txtNomineeTIN.Text;
+        oNomineeEntity.NomineeRightPercentage = float.Parse(txtNRightPersentage.Text);
+        oNomineeEntity.NomineePermanentAddress = txtNPadress.Text;
+        oNomineeEntity.NomineePermanentContact = txtNPContact.Text;
+        oNomineeEntity.NomineePresentAddress = PrNAdress.Text;
+        oNomineeEntity.NomineePresentContact = PrNContact.Text;
+
+        if (ChISMature.Checked)
+        {
+            oNomineeEntity.NomineeIsMature = 1;
+
+        }
+        else
+        {
+            oNomineeEntity.NomineeIsMature = 0;
+        }
+
+        oNomineeEntity.ClientID = txtMBClientID.Text;
+        oNomineeEntity.NomineeDOB = DateTime.Parse(txtDOB.Text);
+        oNomineeEntity.NomineeCreateBy = DateTime.Now.ToShortDateString();
+        oNomineeEntity.NomineeLastModified = DateTime.Now.ToShortDateString();
+
+        string message = "";
+        if (btnSave.Text == "Update")
+        {
+            if (Session["NomSL"] != null)
+            {
+                oNomineeEntity.NomSL = Convert.ToInt64(Session["CuSL"]);
+                int i = oNomineeDAO.UpdateNominee(oNomineeEntity);
+
+                if (i == 1)
+                {
+                    message = "Nominee Updated Successfully";
+                  
+                    Clear();
+                }
+                else
+                    message = "Nominee Not Updated!";
+            }
+        }
+        else
+        {
+            int i = oNomineeDAO.InsertNominee(oNomineeEntity);
+
+            if (i == 1)
+            {
+                message = "Nominee Created Successfully";
+            
+                Clear();
+            }
+            else
+                message = "Nominee Not Created!";
+        }
+
+       
+        
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        
+    }
+
+    protected void btnEdit_Click(object sender, EventArgs e)
+    {
+
+        LinkButton b = (LinkButton)sender;
+        GridViewRow row = (GridViewRow)b.NamingContainer;
+        if (row != null)
+        {
+            int index = row.RowIndex; //gets the row index selected
+            int id = Convert.ToInt32(GridView1.DataKeys[index].Value.ToString());
+            //grab the values here
+            //string myVariable = row.Cells[1].Text;
+            string condition = " where NomSL='" + id + "'";
+            //DataTable dt = oCustomerDAO.GetCustomer(condition);
+            DataTable dt = oNomineeDAO.GetNominee(condition);
+            
+            if (dt.Rows.Count > 0)
+            {
+                txtNomineeID.Text = dt.Rows[0]["NomineeID"].ToString();
+                ChISMature.Checked = Convert.ToBoolean(dt.Rows[0]["NomineeIsMature"]);
+                txtNomineename.Text = dt.Rows[0]["NomineeName"].ToString();
+                txtNommineeFaterName.Text = dt.Rows[0]["NomineeFatherName"].ToString();
+                txtNomineeSex.SelectedValue = dt.Rows[0]["NomineeSex"].ToString();
+                txtReligion.SelectedValue = dt.Rows[0]["NomineeReligion"].ToString();
+                txtRelation.Text = dt.Rows[0]["NomineeRelationWithC"].ToString();
+                txtDOB.Text = Convert.ToDateTime(dt.Rows[0]["NomineeDOB"]).ToString("dd/MM/yyyy");
+                //int cid = Convert.ToInt16(dt.Rows[0]["CountryID"].ToString());
+                drpCountyID.SelectedValue = dt.Rows[0]["NomineeCountryID"].ToString();
+   
+                    //oRtnValue.ReturnValue("tblCountry", "CountryID", dt.Rows[0]["NomineeCountryID"].ToString(), "CountryName");
+
+                txtNomineeNID.Text = dt.Rows[0]["NomineeNID"].ToString();
+                txtNomineeTIN.Text = dt.Rows[0]["NomineeTIN"].ToString();
+
+                txtNRightPersentage.Text = dt.Rows[0]["NomineeRightPercentage"].ToString();
+                txtNPadress.Text = dt.Rows[0]["NomineePermanentAddress"].ToString();
+                txtNPContact.Text = dt.Rows[0]["NomineePermanentContact"].ToString();
+                PrNAdress.Text = dt.Rows[0]["NomineePresentAddress"].ToString();
+                PrNContact.Text = dt.Rows[0]["NomineePresentContact"].ToString();
+                txtMBClientID.SelectedValue = dt.Rows[0]["ClientID"].ToString();
+                oNomineeEntity.NomineeLastModified = DateTime.Now.ToShortDateString();
+                Session["NomSL"] = id;
+
+                btnSave.Text = "Update";
+            }
+
+          
+        }
+    }
+
+
+    public void Clear()
+    {
+       
+        txtNomineename.Text = "";
+        txtNommineeFaterName.Text = "";
+        txtNomineeNID.Text = "";
+        txtNomineeTIN.Text = "";
+        txtNRightPersentage.Text = "";
+        txtNPadress.Text = "";
+        txtNPContact.Text = "";
+        PrNAdress.Text = "";
+        PrNContact.Text = "";
+        txtRelation.Text = "";
+        //txtMBClientID.Text = "";
+        btnSave.Text = "Save";
+
+    }
+
+    private void gridViewBind()
+    {
+        oNomineeDAO = new NomineeDAO();
+        string condition = " order by NomSL desc";
+        DataTable dt = oNomineeDAO.GetNominee(condition);
+        if (dt.Rows.Count > 0)
+        {
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+
+
+
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowState == DataControlRowState.Edit)
+        {
+            e.Row.Cells[0].Controls[0].Visible = false;
+        }
+    }
+    protected void GridView1_RowUpdated(object sender, GridViewUpdatedEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        gridViewBind();
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        gridViewBind();
+    }
+
+    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+
+        protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        //GridView1.EditIndex = -1;
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+        {
+            oNomineeEntity.NomSL = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+    int i = oNomineeDAO.DeleteNominee(oNomineeEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+        {
+            message = "Data Deleted Successfully";
+        }
+        else
+            message = "Data Not Deleted!";
+        
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        gridViewBind();
+       
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+    }
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+
+    private void LoadDropDownList()
+    {
+        DataTable dt = oNomineeDAO.GetClient("");
+        if (dt.Rows.Count > 0)
+        {
+            txtMBClientID.DataSource = dt;
+            txtMBClientID.DataTextField = "ClientID";
+            txtMBClientID.DataValueField = "ClientID";
+            txtMBClientID.DataBind();
+        }
+        
+  
+        dt = new DataTable();
+        dt = oNomineeDAO.GetCountry("");
+        if (dt.Rows.Count > 0)
+        {
+            drpCountyID.DataSource = dt;
+            drpCountyID.DataTextField = "CountryName";
+            drpCountyID.DataValueField = "CountryID";
+            drpCountyID.DataBind();
+        }
+
+
+    }
+
+
+
+}

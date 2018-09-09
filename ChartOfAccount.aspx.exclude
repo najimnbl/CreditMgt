@@ -1,0 +1,373 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="ChartOfAccount.aspx.cs" Inherits="ChartOfAccount" %>
+
+
+
+<asp:Content ID="Content2" runat="server" ContentPlaceHolderID="MainContent">
+  
+ <center>
+     <table>
+ <tr>
+ 
+
+ <th class="style1">
+ <fieldset  style="width: 400px;" >
+  <legend>Chart Of Account</legend>
+
+  <table  border="0"  >
+
+    <tr>
+    <th class="style24">Account No</th>
+    <th class="style27"> 
+        <asp:TextBox ID="txtGrpAccNo" runat="server" 
+           width="136px" MaxLength="20" ontextchanged="txtGrpAccNo_TextChanged" AutoPostBack="true" ></asp:TextBox> 
+        <asp:Button ID="seachButton" runat="server" Text="Search" 
+            onclick="seachButton_Click" />
+        </th>
+    
+      <th class="style26">
+
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ValidationGroup="g" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtGrpAccNo"
+                runat="server"/>
+    </th>
+
+    </tr>
+
+   
+
+    <tr> 
+    <th class="style14">Account Name</th>
+    <th class="style15"> <asp:TextBox ID="txtAccName" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style16">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ErrorMessage="Required" ValidationGroup="g" ForeColor="Red" ControlToValidate="txtAccName"
+                runat="server" />
+    </th>
+    </tr>
+
+
+
+
+
+    <tr>
+    <th class="style11"> Group Account </th> 
+    <th class="style12">
+       
+     <asp:DropDownList ID ="drpGoupAccountName" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px" 
+            onselectedindexchanged="drpGoupAccountName_SelectedIndexChanged" AutoPostBack="true">
+              
+            </asp:DropDownList>
+     </th>
+
+      <th class="style13">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator5" ErrorMessage="Required" ValidationGroup="g" ForeColor="Red" ControlToValidate="drpGoupAccountName"
+           InitialValue="--Select--"     runat="server" />
+    </th>
+
+    </tr>
+
+     <tr>
+    <th class="style11">Sub Group Account </th> 
+    <th class="style12">
+       
+     <asp:DropDownList ID ="subGroupAccDropDownList" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px" 
+            onselectedindexchanged="subGroupAccDropDownList_SelectedIndexChanged" AutoPostBack="true">
+              
+            </asp:DropDownList>
+     </th>
+
+      <th class="style13">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator6" ErrorMessage="Required" ValidationGroup="g" ForeColor="Red" ControlToValidate="subGroupAccDropDownList"
+             runat="server" />
+    </th>
+
+    </tr>
+     <tr>
+    <th class="style11">Account Type </th> 
+    <th class="style12">
+       
+     <asp:DropDownList ID ="accTypeDropDownList" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px" DataSourceID="SqlDataSource1" 
+            DataTextField="AccTypeName" DataValueField="AccTypeSL">
+              
+            </asp:DropDownList>
+        <asp:SqlDataSource ID="SqlDataSource1" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" 
+            SelectCommand="SELECT * FROM [tblAccountType]"></asp:SqlDataSource>
+     </th>
+
+      <th class="style13">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator7" ErrorMessage="Required" ValidationGroup="g" ForeColor="Red" ControlToValidate="accTypeDropDownList"
+             runat="server" />
+    </th>
+
+    </tr>
+  <tr>
+    <th class="style11">Report Type </th> 
+    <th class="style12">
+       
+     <asp:DropDownList ID ="reportTypeDropDownList" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px" DataSourceID="SqlDataSource2" 
+            DataTextField="AccGrpNameR" DataValueField="AccGrpSLR">
+              
+            </asp:DropDownList>
+        <asp:SqlDataSource ID="SqlDataSource2" runat="server" 
+            ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" 
+            SelectCommand="SELECT * FROM [tblAccountGroupReport]"></asp:SqlDataSource>
+     </th>
+
+      <th class="style13">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator8" ErrorMessage="Required" ValidationGroup="g" ForeColor="Red" ControlToValidate="reportTypeDropDownList"
+             runat="server" />
+    </th>
+
+    </tr>
+
+    <tr> 
+    <th class="style28">Opening Balance</th>
+    <th class="style1"> <asp:TextBox ID="txtBalance" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style30">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator9" ErrorMessage="Required" ValidationGroup="g" ForeColor="Red" ControlToValidate="txtBalance"
+                runat="server" />
+    </th>
+    </tr>
+
+    
+
+    <%--<script src="../../Scripts/jquery-1.3.2.min.js" language="javascript" type="text/javascript"/>
+
+<script src="../../Scripts/jquery-ui-1.7.1.custom.min.js" type="text/javascript"/>
+--%>
+    </table> 
+
+ </fieldset>
+</th>
+
+
+
+
+
+</tr>
+</table>
+
+<table>
+
+ <tr> 
+ <td>
+     <asp:Button  ID ="saveButton" Text="Save" ValidationGroup="g" runat="Server"  
+         Width="100px" onclick="saveButton_Click"  > </asp:Button>
+
+     </td>
+     
+     <td>
+  
+    <asp:Button  ID ="Button2" Text="New" runat="Server" Width="100px" 
+             onclick="newButton_Click" > </asp:Button>
+    </td>
+     </tr>
+    
+</table>
+ </center>
+ <center>
+ <table ><tr><td >
+       
+             <asp:GridView ID="GridView1" runat="server" AllowPaging="true" 
+                    AutoGenerateColumns="false" DataKeyNames="CoAccSL"
+                    OnPageIndexChanging="GridView1_PageIndexChanging" 
+                  
+                    OnRowDeleting="GridView1_RowDeleting" 
+                 
+                    PageSize="5"  >
+                    <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                    <Columns>
+   
+                        <asp:TemplateField HeaderText="AccNo">
+                           
+                            <ItemTemplate>
+                                <asp:Label ID="CoAccNoLabel" runat="server" Text='<%#Eval("CoAccNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Account Name">
+                           
+                            <ItemTemplate>
+                                <asp:Label ID="CoAccNameLabel" runat="server" Text='<%#Eval("CoAccName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="GrpAccName">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="GrpAccNameLabel" runat="server" 
+                                    Text='<%#Eval("GrpAccName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                         <asp:TemplateField HeaderText="SGrpAccName">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="SGrpAccNameLabel" runat="server" 
+                                    Text='<%#Eval("SGrpAccName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="AccTypeName">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="AccTypeNameLabel" runat="server" 
+                                    Text='<%#Eval("AccTypeName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                          <asp:TemplateField HeaderText="Opening Balance">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="OpenDayBalanceLabel" runat="server" 
+                                    Text='<%#Eval("OpenDayBalance") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                       
+                       <%-- <asp:TemplateField HeaderText="Right">
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerSexLabel" runat="server" 
+                                    Text='<%#Eval("NomineeRightPercentage") %>'></asp:Label>
+                            </ItemTemplate>
+                      
+                        </asp:TemplateField>--%>
+                     
+                          
+                  <asp:TemplateField>
+        <ItemTemplate>
+                <asp:LinkButton ID="btnEdit" ForeColor="Black" runat="server" Text="Edit" OnClick="btnEdit_Click"/>
+        </ItemTemplate>
+    </asp:TemplateField>
+                                               
+                   
+                      <asp:CommandField ShowDeleteButton="true" />
+                      
+                    </Columns>
+                    <EditRowStyle BackColor="#999999" />
+                    <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                    <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                    <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                    <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                    <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                    <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                    <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                    <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                    <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+                </asp:GridView>
+          
+             </td></tr>
+            
+             </table>
+             </center>
+</asp:Content>
+<asp:Content ID="Content1" runat="server" contentplaceholderid="HeadContent">
+    <style type="text/css">
+        .style1
+        {
+            width: 375px;
+
+        }
+        .style11
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+            height: 25px;
+        }
+        .style12
+        {
+            width: 375px;
+            height: 25px;
+        }
+        .style13
+        {
+            width: 46px;
+            height: 25px;
+        }
+        .style14
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+            height: 28px;
+        }
+        .style15
+        {
+            width: 375px;
+            height: 28px;
+        }
+        .style16
+        {
+            width: 46px;
+            height: 28px;
+        }
+        .style20
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+            height: 18px;
+        }
+        .style22
+        {
+            width: 46px;
+            height: 18px;
+        }
+        .style23
+        {
+            width: 375px;
+            height: 18px;
+        }
+        .style24
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+            height: 21px;
+        }
+        .style26
+        {
+            width: 46px;
+            height: 21px;
+        }
+        .style27
+        {
+            width: 375px;
+            height: 21px;
+        }
+        .style28
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+        }
+        .style30
+        {
+            width: 46px;
+        }
+    </style>
+</asp:Content>
+

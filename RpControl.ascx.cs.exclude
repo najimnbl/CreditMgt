@@ -1,0 +1,402 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using System.Configuration;
+using System.Data;
+
+
+public partial class RpControl : System.Web.UI.UserControl
+{
+    
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        if (!IsPostBack)
+        {
+
+        }
+
+
+        else if (Convert.ToString(Session["rpttype"]) == "GLMatch")
+        {
+
+            DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMatchingGL.rpt"));
+        }
+
+        else if (Convert.ToString(Session["rpttype"]) == "RPTReconsilationMitchMatchGL")
+        {
+
+            DisplayReportGL(Server.MapPath("~/Reports/RPTReconsilationMitchMatchGL.rpt"));
+        }
+
+        else if (Convert.ToString(Session["rpttype"]) == "RPTReconsilationMatchingPL")
+        {
+            DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMatchingPL.rpt"));
+
+        }
+
+        else if (Convert.ToString(Session["rpttype"]) == "RPTReconsilationMitchMatchPL")
+        {
+            DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMitchMatchPL.rpt"));
+
+        }
+
+        else if (Convert.ToString(Session["rpttype"]) == "RptLDReconFinal")
+        {
+            DisplayReportGL(Server.MapPath("./Reports/RptLDReconFinal.rpt"));
+
+        }
+
+
+
+
+        //else if ((Convert.ToString(Session["rpttype"]) == "PLConfigOriginal"))
+        //{
+
+
+        //   DisplayReportConfigure(Server.MapPath("./Reports/RPTPLConfiguretionOriginal.rpt"));
+
+
+
+        //}
+
+        //    //
+        //else if (Convert.ToString(Session["rpttype"]) == "GLConfigReport")
+        //{
+
+        //    DisplayReportCon(Server.MapPath("./Reports/RPTGLConfiguretion.rpt"));
+        //}
+
+        //else if (Convert.ToString(Session["rpttype"]) == "GLConfigReportZ")
+        //{
+
+        //    DisplayReportCon(Server.MapPath("~/Reports/RPTGLConfiguretionnonWZero.rpt"));
+        //}
+
+      
+
+
+        //else if ((Convert.ToString(Session["rpttype"]) == "GLConfigOriginal"))
+        //{
+
+
+        //    DisplayReportConfigure(Server.MapPath("./Reports/RPTGLConfiguretionOriginal.rpt"));
+
+
+
+        //}
+        //else if ((Convert.ToString(Session["rpttype"]) == "RPTConsolidaedGLReconciliation"))
+        //{
+        // DisplayReportGL(Server.MapPath("./Reports/RPTConsolidaedGLReconciliation.rpt"));
+        //}
+
+        else
+        {
+
+            return;
+
+        }
+
+ 
+
+
+    }
+
+    public void DisplayReport(string reportPath)
+    {
+
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "MigrationTool";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.RefreshReport();
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+        CrystalReportViewer2.ReportSource = document;
+    }
+    public void DisplayReportGL(string reportPath)
+    {
+
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "MigrationTool";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.RefreshReport();
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+        CrystalReportViewer2.ReportSource = document;
+    }
+
+    public void DisplayReportCon(string reportPath)
+    {
+
+
+        //ReportDocument rptDoc = new ReportDocument();
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        //string serName = ConfigurationManager.ConnectionStrings["Conn"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "T24ReportDBNBL";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        //document.SetParameterValue(0,check );
+
+
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+
+
+        CrystalReportViewer2.RefreshReport();
+
+        CrystalReportViewer2.ReportSource = document;
+
+        //CrystalReportViewer1.ReportSourceID = "CrystalReportViewer1";
+
+        //CrystalReportViewer1
+
+    }
+    public void DisplayReportConWZ(string reportPath)
+    {
+
+
+        //ReportDocument rptDoc = new ReportDocument();
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "T24ReportDBNBL";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+
+
+        CrystalReportViewer2.RefreshReport();
+
+
+
+        CrystalReportViewer2.ReportSource = document;
+        
+
+
+
+    }
+
+
+    public void DisplayReportConfigure(string reportPath)
+    {
+
+
+        //ReportDocument rptDoc = new ReportDocument();
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "T24ReportDBNBL";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+
+
+        CrystalReportViewer2.RefreshReport();
+
+
+
+        CrystalReportViewer2.ReportSource = document;
+
+
+
+
+    }
+
+
+
+
+    //
+    public void GLDisplayReportCon(string reportPath)
+    {
+
+
+        //ReportDocument rptDoc = new ReportDocument();
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "T24ReportDBNBL";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        //document.SetParameterValue(0,check );
+
+
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+
+
+        CrystalReportViewer2.RefreshReport();
+
+        CrystalReportViewer2.ReportSource = document;
+
+        //CrystalReportViewer1.ReportSourceID = "CrystalReportViewer1";
+
+        //CrystalReportViewer1
+
+    }
+    public void GLDisplayReportConWZ(string reportPath)
+    {
+
+
+        //ReportDocument rptDoc = new ReportDocument();
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "T24ReportDBNBL";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+
+
+        CrystalReportViewer2.RefreshReport();
+
+
+
+        CrystalReportViewer2.ReportSource = document;
+
+
+
+
+    }
+
+
+    public void GLDisplayReportConfigure(string reportPath)
+    {
+
+
+        //ReportDocument rptDoc = new ReportDocument();
+        ReportDocument document = new ReportDocument();
+        document.Load(reportPath);
+        Session.Add("CrStaffrecruit", document);
+        Tables reportTables = document.Database.Tables;
+        ConnectionInfo connectionInfo = new ConnectionInfo();
+        string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+        connectionInfo.ServerName = serName;
+        connectionInfo.DatabaseName = "T24ReportDBNBL";
+        connectionInfo.UserID = "abc";
+        connectionInfo.Password = "sys123";
+        foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+        {
+            TableLogOnInfo logonInfo = tbl.LogOnInfo;
+            logonInfo.ConnectionInfo = connectionInfo;
+            tbl.ApplyLogOnInfo(logonInfo);
+        }
+        CrystalReportViewer2.EnableDatabaseLogonPrompt = false;
+        CrystalReportViewer2.ParameterFieldInfo.Clear();
+
+
+        CrystalReportViewer2.RefreshReport();
+
+
+
+        CrystalReportViewer2.ReportSource = document;
+
+
+
+
+    }
+
+    //
+
+
+
+    protected void Page_unload(object sender, EventArgs e)
+    {
+
+        //CrystalReportViewer2.close();
+        //CrystalReportViewer2.dispose();
+
+
+
+    }
+
+
+
+}

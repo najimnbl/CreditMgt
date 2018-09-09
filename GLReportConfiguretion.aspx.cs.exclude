@@ -1,0 +1,111 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using System.IO;
+using System.Data.SqlTypes;
+
+public partial class GLReportConfiguretion : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            GridLoad();
+        }
+
+
+    }
+
+    public void GridLoad()
+    {
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("select SL ,line,Legacy,AcDesc,ClosingBal,typeofData,reportFlag from  GLBalanceConfigaretion order by Line  ", conn);
+        GridView1.DataSource = objcmd.ExecuteReader();
+        GridView1.DataBind();
+        GridView1.EditIndex = -1;
+
+
+    }
+
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        
+    }
+
+
+
+    protected void GridView1_RowEditing1(object sender, GridViewEditEventArgs e)
+    {
+        
+    }
+
+
+
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+
+        btnSave.Enabled = false;
+        var rows = GridView1.Rows;
+        int count = GridView1.Rows.Count;
+
+        //double amount = 0;
+
+        SqlConnection conn = dbconnection.connection();
+        for (int i = 0; i < count; i++)
+        {
+
+            bool isChecked = ((CheckBox)rows[i].FindControl("Flag")).Checked;
+            if (isChecked)
+            {
+
+                //+ GridView1.Rows[i].Cells[1].Text +
+
+                SqlCommand objcmd = new SqlCommand("update  GLBalanceConfigaretion Set  reportFlag =  1  where SL= '" + Convert.ToInt32(((Label)rows[i].FindControl("SL")).Text) + "'", conn);
+
+                objcmd.ExecuteNonQuery();
+
+            }
+
+            else
+            {
+
+                SqlCommand objcmd = new SqlCommand("update  GLBalanceConfigaretion Set  reportFlag =  0  where SL= '" + Convert.ToInt32(((Label)rows[i].FindControl("SL")).Text) + "'", conn);
+
+                objcmd.ExecuteNonQuery();
+
+            }
+
+
+        }
+        conn.Close();
+
+
+        string message = "Data Save Successfully. ";
+        ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+        btnSave.Enabled = true;
+
+    }
+    //protected void btnNew_Click(object sender, EventArgs e)
+    //{
+
+    //}
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        GridLoad();
+
+
+    }
+}

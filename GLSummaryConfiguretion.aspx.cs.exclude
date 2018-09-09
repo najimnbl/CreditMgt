@@ -1,0 +1,166 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using System.IO;
+using System.Data.SqlTypes;
+
+
+public partial class GLSummaryConfiguretion : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+        if (!IsPostBack)
+        {
+            GridLoad();
+        }
+
+
+
+    }
+    protected void btnNew_Click(object sender, EventArgs e)
+    {
+        ClearField();
+
+    }
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+
+        if (btnSave.Text == "Save")
+        {
+            SqlConnection conn = dbconnection.connection();
+            SqlCommand objcmd = new SqlCommand("insert into GLSummary (LStart,LEnd,Heading,Remarks) values ('" + txtLstart.Text + "','" + txtLEnd.Text + "','" + txtHeading.Text + "','" + txtRemarks.Text + "')", conn);
+
+            objcmd.ExecuteNonQuery();
+            conn.Close();
+
+
+            //string message = "Data Save Successfully. ";
+            //ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+            GridView1.EditIndex = -1;
+
+
+        }
+        else
+        {
+            SqlConnection conn = dbconnection.connection();
+            //SqlCommand objcmd = new SqlCommand("insert into PLSummary (LStart,LEnd,Heading,Remarks) values ('" + txtLstart.Text  + "','" + txtLEnd.Text  + "','" + txtHeading.Text  + "','" + txtRemarks.Text + "')" , conn);
+            SqlCommand objcmd = new SqlCommand("update  GLSummary  set LStart='" + txtLstart.Text + "',LEnd='" + txtLEnd.Text + "',Heading='" + txtHeading.Text + "',Remarks='" + txtRemarks.Text + "' where SL='" + label1.Text + "'", conn);
+
+
+            objcmd.ExecuteNonQuery();
+            conn.Close();
+
+            //LblMgs.ForeColor = System.Drawing.Color.Green;
+            //LblMgs.Text = "Data Uploaded successfully for the month " + TransMonth.ToString("MMM-yyyy");
+            //string message = "Data Updated Successfully. ";
+            //ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+            GridView1.EditIndex = -1;
+
+
+        }
+        ClearField();
+        GridLoad();
+
+    }
+
+
+    private void ClearField()
+    {
+
+        txtLstart.Text = "";
+        txtLEnd.Text = "";
+        txtHeading.Text = "";
+        txtRemarks.Text = "";
+        label1.Text = "";
+        btnSave.Text = "Save";
+    }
+
+    public void GridLoad()
+    {
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("Select Sl,LStart,LEnd,Heading,Remarks  from GLSummary ", conn);
+        GridView1.DataSource = objcmd.ExecuteReader();
+        GridView1.DataBind();
+        GridView1.EditIndex = -1;
+    }
+
+
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        int row = Convert.ToInt32(GridView1.Rows[int.Parse(e.RowIndex.ToString())].RowIndex);
+        label1.Text = GridView1.Rows[row].Cells[2].Text;
+
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("delete from GLSummary  where sl= '" + label1.Text + "'", conn);
+        objcmd.ExecuteNonQuery();
+        conn.Close();
+
+        GridView1.EditIndex = -1;
+        //string message = "Data Delete Successfully. ";
+        //ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+        GridLoad();
+    }
+
+
+
+    protected void GridView1_RowEditing1(object sender, GridViewEditEventArgs e)
+    {
+        int row = Convert.ToInt32(GridView1.Rows[int.Parse(e.NewEditIndex.ToString())].RowIndex);
+        label1.Text = GridView1.Rows[row].Cells[2].Text;
+        txtLstart.Text = GridView1.Rows[row].Cells[3].Text;
+        txtLEnd.Text = GridView1.Rows[row].Cells[4].Text;
+
+        txtHeading.Text = GridView1.Rows[row].Cells[5].Text.ToString();
+        txtRemarks.Text = GridView1.Rows[row].Cells[6].Text.ToString();
+
+
+
+      
+        
+        btnSave.Text = "Update";
+
+    }
+
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowState == DataControlRowState.Edit)
+        {
+            e.Row.Cells[0].Controls[0].Visible = false;
+        }
+    }
+    protected void GridView1_RowUpdated(object sender, GridViewUpdatedEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        GridLoad();
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        GridLoad();
+    }
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        GridLoad();
+
+
+    }
+
+
+
+
+    
+}

@@ -1,0 +1,278 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using System.IO;
+using System.Data.SqlTypes;
+
+public partial class GLGLDataImport : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    
+
+        if (!IsPostBack)
+        {
+            LoadBranch(1, "");
+        }
+        
+        
+       
+    }
+
+
+    public void LoadBranch(int a, string code)
+    {
+        DataSet ds = new DataSet();
+        SqlConnection conn = dbconnection.connection();
+        //string quiry = "select code from program where Code <>'" + code + "'  order by code";
+
+        string quiry = "select BranchName,BrCode  from BranchInfo  order by  BranchName";
+        
+        
+        
+        SqlDataAdapter dt = new SqlDataAdapter(quiry, conn);
+        dt.Fill(ds);
+        drpBranch.DataSource = ds;
+        drpBranch.DataTextField = "BranchName";
+        drpBranch.DataValueField = "BrCode";
+        drpBranch.DataBind();
+
+        if (a == 1)
+        {
+            drpBranch.Items.Insert(0, "--Select--");
+        }
+
+    }
+
+    public void DeletePriviusData()
+    
+    
+    {
+
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("Delete from  GLPLBalance where brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+        objcmd.ExecuteNonQuery();
+        conn.Close();
+    
+    
+    }
+
+
+
+    public void btnImport_Click(object sender, EventArgs e)
+    {
+
+        btnImport.Enabled = false;
+
+        //if (Session["user"].ToString() != drpBranch.SelectedValue && Session["user"].ToString()!="Admin")
+        //{
+
+
+        //    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+        //    btnImport.Enabled = true;
+            
+        //    return;
+
+        //}
+
+
+
+        DeletePriviusData();
+        
+        
+        SqlConnection conn = dbconnection.connection();
+        string strFilename = "D:\\Migration\\GL.Txt";
+
+        string line = null;
+        string[] StrArray = new string[4];
+        string AsOneDate;
+
+        using (StreamReader file = new StreamReader( strFilename))
+        {
+            line = file.ReadLine();
+
+
+
+            if (!string.IsNullOrEmpty(line) && line.Length > 90 && line.Substring(2, 8) == "RE000010")
+            {
+
+                string ason = line.Substring(90, 11);
+                string[] d = ason.Split(' ');
+                //AsOneDate = Convert.ToDateTime(d[2] + "-" + d[1] + "-" + d[0]);
+                AsOneDate = d[0] + "-" + d[1] + "-" + d[2];
+            }
+
+
+            else
+
+
+            {
+
+                AsOneDate = null;
+            
+            
+            
+            }
+            
+            
+            while ((line = file.ReadLine()) != null)
+            {
+
+
+                
+
+                if (!string.IsNullOrEmpty(line) && line.Length > 4)
+                {
+                    int n;
+                    string a;
+                    a = line.Substring(0, 4);
+                    bool isNumeric = int.TryParse(line.Substring(0, 4), out n);
+
+                    if (isNumeric)
+                    {
+                        if (line.Length >= 4)
+                        {
+                            StrArray[0] = line.Substring(0, 4).Trim();
+                        }
+                        else
+                        {
+                            StrArray[0] = null;
+                        }
+
+                        if (line.Length >= 12)
+                        {
+                            StrArray[1] = line.Substring(6, 6).Trim();
+                        }
+                        else
+                        {
+                            StrArray[1] = null;
+                        }
+                        if (line.Length >= 55)
+                        {
+                            StrArray[2] = line.Substring(26, 29).Trim();
+                        }
+                        else
+                        {
+                            StrArray[2] = null;
+                        }
+                        if (line.Length >= 90)
+                        {
+                            StrArray[3] = line.Substring(70, 20).Trim();
+                        }
+                        else
+                        {
+                            StrArray[3] = null;
+                        }
+
+                        //////Test
+                        //if (StrArray[0] == "9999")
+                        //{
+                        //     a = line.Substring(0, 4);
+                        //     string ttt = StrArray[0];
+
+                        //}
+                        ////////
+
+
+
+
+                        using (SqlCommand cmd = new SqlCommand("SPInsertGLPLBalance", conn))
+                        {
+                            try
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                                cmd.Parameters.Add("@Line", SqlDbType.Char).Value = StrArray[0];
+                                if (!string.IsNullOrEmpty(StrArray[1]))
+                                {
+                                    cmd.Parameters.Add("@Legacy", SqlDbType.Char).Value = StrArray[1];
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add("@Legacy", SqlDbType.Char).Value = SqlChars.Null;
+
+                                }
+                                cmd.Parameters.Add("@AcDesc", SqlDbType.VarChar).Value = StrArray[2];
+                               
+                                if (!string.IsNullOrEmpty(StrArray[3]))
+                                {
+                                    cmd.Parameters.Add("@ClosingBal", SqlDbType.Decimal).Value = StrArray[3].Replace(",", "");
+
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add("@ClosingBal", SqlDbType.Decimal).Value = SqlDecimal.Null;
+
+
+                                }
+                                //cmd.Parameters.Add("@BrCode", SqlDbType.Char).Value = Session["BrCode"];
+                                cmd.Parameters.Add("@BrCode", SqlDbType.Char).Value = drpBranch.SelectedValue ;
+
+                                cmd.Parameters.Add("@ReportingMonth", SqlDbType.DateTime).Value = DateTime.Now;
+
+                                //cmd.Parameters.Add("@Asondate", SqlDbType.VarChar).Value = Session["AsOneDate"];
+
+
+
+                                if (AsOneDate != null)
+                                {
+                                    cmd.Parameters.Add("@AsOneDate", SqlDbType.VarChar).Value = AsOneDate;
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add("@Asondate", SqlDbType.VarChar).Value = SqlChars.Null;
+
+                                }
+                                
+                                
+                                
+                                
+                                int noOfRowsAffected = cmd.ExecuteNonQuery();
+
+                                if (noOfRowsAffected > 0)
+                                {
+                                   
+                    
+                                    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('GL Data Imported Successfully')", true);
+
+                                    btnImport.Enabled = true;
+
+                                }
+                            }
+                            catch (SqlException ex)
+                            {
+                                //LblMgs.ForeColor = System.Drawing.Color.Red;
+                                ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + ex + "');", true);
+                            }
+                            finally
+                            {
+                                if (conn.State != ConnectionState.Closed)
+                                {
+                                    //MySqlConnection.Close();
+                                }
+                            }
+                        }
+
+
+
+
+                    }
+                }
+            }
+
+        }
+    }
+
+   
+}

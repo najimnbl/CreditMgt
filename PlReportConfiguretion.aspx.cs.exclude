@@ -1,0 +1,132 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using System.IO;
+using System.Data.SqlTypes;
+
+public partial class PlReportConfiguretion : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            GridLoad();
+        }
+
+        
+    }
+
+    public void GridLoad()
+    {
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("select SL ,line,Legacy,AcDesc,ClosingBal,typeofData,reportFlag from  PLBalanceConfigaretion order by Line  ", conn);
+        GridView1.DataSource = objcmd.ExecuteReader();
+        GridView1.DataBind();
+        GridView1.EditIndex = -1;
+       
+
+    }
+
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        //int row = Convert.ToInt32(GridView1.Rows[int.Parse(e.RowIndex.ToString())].RowIndex);
+        //label1.Text = GridView1.Rows[row].Cells[2].Text;
+
+        //SqlConnection conn = dbconnection.connection();
+        //SqlCommand objcmd = new SqlCommand("delete from PLSummary  where sl= '" + label1.Text + "'", conn);
+        //objcmd.ExecuteNonQuery();
+        //conn.Close();
+
+        //GridView1.EditIndex = -1;
+        //string message = "Data Delete Successfully. ";
+        //ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+        //GridLoad();
+    }
+
+
+
+    protected void GridView1_RowEditing1(object sender, GridViewEditEventArgs e)
+    {
+        //int row = Convert.ToInt32(GridView1.Rows[int.Parse(e.NewEditIndex.ToString())].RowIndex);
+        //label1.Text = GridView1.Rows[row].Cells[2].Text;
+        //txtLstart.Text = GridView1.Rows[row].Cells[3].Text;
+        //txtLEnd.Text = GridView1.Rows[row].Cells[4].Text;
+
+        //txtHeading.Text = GridView1.Rows[row].Cells[5].Text;
+        //txtRemarks.Text = GridView1.Rows[row].Cells[6].Text;
+
+        //btnSave.Text = "Update";
+
+    }
+
+
+
+
+    protected void btnSave_Click(object sender, EventArgs e)
+    {
+
+        btnSave.Enabled = false;
+        var rows = GridView1.Rows;
+        int count = GridView1.Rows.Count;
+       
+        //double amount = 0;
+
+        SqlConnection conn = dbconnection.connection();
+        for (int i = 0; i < count; i++)
+        {
+          
+            bool isChecked = ((CheckBox)rows[i].FindControl("Flag")).Checked;
+            if (isChecked)
+            {
+
+                //+ GridView1.Rows[i].Cells[1].Text +
+
+                SqlCommand objcmd = new SqlCommand("update  PLBalanceConfigaretion Set  reportFlag =  1  where SL= '" + Convert.ToInt32(((Label)rows[i].FindControl("SL")).Text) + "'", conn);
+
+                objcmd.ExecuteNonQuery();
+          
+            }
+
+            else
+
+            {
+
+                SqlCommand objcmd = new SqlCommand("update  PLBalanceConfigaretion Set  reportFlag =  0  where SL= '" + Convert.ToInt32(((Label)rows[i].FindControl("SL")).Text) + "'", conn);
+
+                objcmd.ExecuteNonQuery();
+
+            }
+           
+
+        }
+        conn.Close();
+
+
+        string message = "Data Save Successfully. ";
+        ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+        btnSave.Enabled = true ;
+
+    }
+    //protected void btnNew_Click(object sender, EventArgs e)
+    //{
+
+    //}
+
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        GridLoad();
+       
+
+    }
+}

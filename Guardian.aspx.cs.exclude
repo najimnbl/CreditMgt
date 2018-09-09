@@ -1,0 +1,187 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class Guardian : System.Web.UI.Page
+{
+    GuadianEntity oGuadianEntity = new GuadianEntity();
+    GuardianDAO oGuardianDAO = new GuardianDAO();
+    NomineeDAO oNomineeDAO = new NomineeDAO();
+    ReturnVal oRtnValue = new ReturnVal();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+
+            string GuardianID = oRtnValue.ReturnValue("tblGuardian", "", "", "isnull(MAX(GuardianID),0000000)+1");
+            int value;
+            int.TryParse(GuardianID, out value);
+            drpNomineeID.Text = value.ToString("D7");
+
+            LoadDropDownList();
+            gridViewBind();
+
+        }
+    }
+
+    private void gridViewBind()
+    {
+        oGuadianEntity = new GuadianEntity();
+        string condition = " order by GurSL desc";
+        DataTable dt = oGuardianDAO.GetGuardian(condition);
+        if (dt.Rows.Count > 0)
+        {
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+        }
+    }
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowState == DataControlRowState.Edit)
+        {
+            e.Row.Cells[0].Controls[0].Visible = false;
+        }
+    }
+    protected void GridView1_RowUpdated(object sender, GridViewUpdatedEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        gridViewBind();
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        gridViewBind();
+    }
+
+    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        //GridView1.EditIndex = -1;
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        oGuadianEntity.GurSL = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oGuardianDAO.DeleteGuardian(oGuadianEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+        {
+            message = "Data Deleted Successfully";
+        }
+        else
+            message = "Data Not Deleted!";
+
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        gridViewBind();
+
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+    }
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+
+    private void LoadDropDownList()
+    {
+        DataTable dt =oNomineeDAO.GetNominee("");
+        if (dt.Rows.Count > 0)
+        {
+            drpNomineeID.DataSource = dt;
+            drpNomineeID.DataTextField = "NomineeID";
+            drpNomineeID.DataValueField = "NomineeID";
+            drpNomineeID.DataBind();
+        }
+
+
+        dt = new DataTable();
+        dt = oNomineeDAO.GetCountry("");
+        if (dt.Rows.Count > 0)
+        {
+            drpCountyID.DataSource = dt;
+            drpCountyID.DataTextField = "CountryName";
+            drpCountyID.DataValueField = "CountryID";
+            drpCountyID.DataBind();
+        }
+    }
+    protected void saveButton_Click(object sender, EventArgs e)
+    {
+
+    }
+    protected void newButton_Click(object sender, EventArgs e)
+    {
+
+    }
+    protected void btnEdit_Click(object sender, EventArgs e)
+    {
+
+        LinkButton b = (LinkButton)sender;
+        GridViewRow row = (GridViewRow)b.NamingContainer;
+        if (row != null)
+        {
+            int index = row.RowIndex; //gets the row index selected
+            int id = Convert.ToInt32(GridView1.DataKeys[index].Value.ToString());
+            //grab the values here
+            //string myVariable = row.Cells[1].Text;
+            string condition = " where GurSL='" + id + "'";
+            //DataTable dt = oCustomerDAO.GetCustomer(condition);
+            DataTable dt =oGuardianDAO.GetGuardian(condition);
+
+            if (dt.Rows.Count > 0)
+            {
+                txtGuardianID.Text = dt.Rows[0]["GuardianID"].ToString();
+                txtGuardianname.Text = dt.Rows[0]["GuardianName"].ToString();
+                txtGuardianFaterName.Text = dt.Rows[0]["GuardianFatherName"].ToString();
+                txtRelation.Text = dt.Rows[0]["GuardianRelationWithN"].ToString();
+                drpGuardianSex.SelectedValue = dt.Rows[0]["GuardianSex"].ToString();
+                drpReligion.SelectedValue = dt.Rows[0]["GuardianReligion"].ToString();
+                txtNomineeNID.Text = dt.Rows[0]["GuardianNID"].ToString();
+                txtGuardianTIN.Text = dt.Rows[0]["GuardianTIN"].ToString();
+                txtGPadress.Text = dt.Rows[0]["GuardianPermanentAddress"].ToString();
+                txtGPContact.Text = dt.Rows[0]["GuardianPermanentContact"].ToString();
+                txtGPadress.Text = dt.Rows[0]["GuardianPresentAddress"].ToString();
+                txtGPContact.Text = dt.Rows[0]["GuardianPresentContact"].ToString();
+                //txtDOB.Text = Convert.ToDateTime(dt.Rows[0]["NomineeDOB"]).ToString("dd/MM/yyyy");
+                //int cid = Convert.ToInt16(dt.Rows[0]["CountryID"].ToString());
+                drpCountyID.SelectedValue = dt.Rows[0]["NomineeCountryID"].ToString();
+
+                //oRtnValue.ReturnValue("tblCountry", "CountryID", dt.Rows[0]["NomineeCountryID"].ToString(), "CountryName");
+
+                //txtNomineeNID.Text = dt.Rows[0]["NomineeNID"].ToString();
+                //txtNomineeTIN.Text = dt.Rows[0]["NomineeTIN"].ToString();
+
+                //txtNRightPersentage.Text = dt.Rows[0]["NomineeRightPercentage"].ToString();
+                //txtNPadress.Text = dt.Rows[0]["NomineePermanentAddress"].ToString();
+                //txtNPContact.Text = dt.Rows[0]["NomineePermanentContact"].ToString();
+                //PrNAdress.Text = dt.Rows[0]["NomineePresentAddress"].ToString();
+                //PrNContact.Text = dt.Rows[0]["NomineePresentContact"].ToString();
+                //txtMBClientID.SelectedValue = dt.Rows[0]["ClientID"].ToString();
+                //oNomineeEntity.NomineeLastModified = DateTime.Now.ToShortDateString();
+                //Session["NomSL"] = id;
+
+                //btnSave.Text = "Update";
+            }
+
+
+        }
+    }
+}

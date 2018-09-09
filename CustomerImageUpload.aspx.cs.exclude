@@ -1,0 +1,318 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.IO;
+using System.Data.SqlClient;
+using System.Configuration;
+
+public partial class CustomerImageUpload : System.Web.UI.Page
+{
+    CustomerEntity oCustomerEntity = new CustomerEntity();
+    CustomerDAO oCustomerDAO = new CustomerDAO();
+    ImageAndSignatureDAO oImageAndSignatureDAO = new ImageAndSignatureDAO();
+    public string query, constr;
+    public SqlConnection con;
+    public void connection()
+    {
+        //constr = ConfigurationManager.ConnectionStrings["ApplicationServices"].ToString();
+        constr = ConfigurationManager.ConnectionStrings["ImageDBConnection"].ToString();
+        con = new SqlConnection(constr);
+        con.Open();
+
+
+    }
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            loadCustomerDropDownList();
+
+        }
+    }
+
+    private void loadCustomerDropDownList()
+    {
+        string condition = "";
+        DataTable dt = oCustomerDAO.GetCustomer(condition);
+        customerDropDownList.DataSource = dt;
+        customerDropDownList.DataTextField = "CustomerID";
+        customerDropDownList.DataValueField = "CustomerID";
+        customerDropDownList.DataBind();
+    
+        imagebindGrid();
+
+    }
+    private void Imageupload()
+    {
+        if (customerDropDownList.SelectedValue == "" || customerDropDownList.SelectedValue == null)
+            return;
+        if (FileUpload1.HasFile)
+        {
+           
+            int imagefilelenth = FileUpload1.PostedFile.ContentLength;
+            string fname = FileUpload1.FileName;
+            string fext = Path.GetExtension(fname);
+            fext = fext.ToLower();
+            int k = CheckFileSize(imagefilelenth,fext);
+            if (k == 0)
+              return;
+                 
+                     byte[] imgarray = new byte[imagefilelenth];
+
+                     HttpPostedFile image = FileUpload1.PostedFile;
+                     image.InputStream.Read(imgarray, 0, imagefilelenth);
+
+
+                     string filepath = Server.MapPath("~/image/signatureimages.png");
+                     System.IO.FileInfo fi = new System.IO.FileInfo(filepath);
+                     int signaturefilelenth = (int)fi.Length;
+                     byte[] signaturearray = new byte[signaturefilelenth];
+
+                     if (FileUpload2.HasFile)
+                     {
+                         fname = FileUpload2.FileName;
+                         fext = Path.GetExtension(fname);
+                         fext = fext.ToLower();
+                       
+                         signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+                         int j = CheckFileSize(signaturefilelenth, fext);
+                         if (j == 0)
+                             return;
+                             
+                                 signaturearray = new byte[signaturefilelenth];
+
+                                 HttpPostedFile signature = FileUpload2.PostedFile;
+                                 signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+                             
+
+                         
+
+
+                     }
+                     int i = oImageAndSignatureDAO.InsertCustomerImageAndSignature(imgarray, signaturearray, customerDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), DateTime.Now.ToShortDateString());
+                     imagebindGrid();
+                     
+                 
+             
+           
+
+        }
+        else if (FileUpload2.HasFile)
+        {
+            int signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+            byte[] signaturearray = new byte[signaturefilelenth];
+
+            HttpPostedFile signature = FileUpload2.PostedFile;
+            signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+            string fname = FileUpload2.FileName;
+            string fext = Path.GetExtension(fname);
+            fext = fext.ToLower();
+            int j = CheckFileSize(signaturefilelenth, fext);
+            if (j == 0)
+                return;
+            string filepath = Server.MapPath("~/image/blankimages.jpg"); 
+            System.IO.FileInfo fi = new System.IO.FileInfo(filepath);
+            int imagefilelenth = (int)fi.Length;
+            byte[] imgarray = new byte[signaturefilelenth];
+            fname = FileUpload1.FileName;
+            fext = Path.GetExtension(fname);
+            fext = fext.ToLower();
+            if (FileUpload1.HasFile)
+            {
+                imagefilelenth = FileUpload1.PostedFile.ContentLength;
+                imgarray = new byte[imagefilelenth];
+                int k = CheckFileSize(imagefilelenth, fext);
+                if (k == 0)
+                    return;
+                HttpPostedFile image = FileUpload1.PostedFile;
+                image.InputStream.Read(imgarray, 0, imagefilelenth);
+            }
+            int i = oImageAndSignatureDAO.InsertCustomerImageAndSignature(imgarray, signaturearray, customerDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString(), DateTime.Now.ToShortDateString());
+            imagebindGrid();
+        }
+        
+       
+       
+    }
+
+    private int CheckFileSize(int imagefilelenth, string fext)
+    {
+        int i = 0;
+        if (imagefilelenth < 102400)
+        {
+            if (fext == ".jpg" || fext == ".png" || fext == ".gif" || fext == ".bmp")
+            { i = 1; }
+            else 
+            { Response.Write("<script>alert('Only image files are allowed');</script>"); }
+        }
+        else 
+        { Response.Write("<script>alert('Max file size allowed is 100 KB');</script>"); }
+        return i;
+    }
+
+    public void imagebindGrid()
+    {
+       
+        
+
+        DataTable dt = new DataTable();
+        string condition=" where CustomerID="+customerDropDownList.SelectedValue+"";
+        dt = oImageAndSignatureDAO.GetCustomerImageAndSignature(condition);
+        if (dt.Rows.Count > 0)
+        {
+            //Image1..ImageUrl ="Handler1.ashx?id_Image="+ dt.Rows[0]["ID"].ToString();
+            Gridview1.DataSource = dt;
+            Gridview1.DataBind();
+            //btnimguplod.Text = "Update";
+            btnimguplod.Visible = false;
+            Button1.Visible = true;
+        }
+        else
+        {
+            btnimguplod.Visible = true;
+            Button1.Visible = false;
+            Gridview1.DataSource = dt;
+            Gridview1.DataBind();
+          
+        }
+
+    }
+    protected void upload(object sender, EventArgs e)
+    {
+       
+        Imageupload();
+        
+    }
+
+    
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        if (customerDropDownList.SelectedValue == "" || customerDropDownList.SelectedValue == null)
+            return;
+        string confirmValue = Request.Form["confirm_value"];
+        if (confirmValue == "Yes")
+        {
+            string condition = " where CustomerID=" + customerDropDownList.SelectedValue + "";
+            DataTable dt = oImageAndSignatureDAO.GetCustomerImageAndSignature(condition);
+
+
+            if (FileUpload1.HasFile)
+            {
+
+                int imagefilelenth = FileUpload1.PostedFile.ContentLength;
+                string fname = FileUpload1.FileName;
+                string fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+                int k = CheckFileSize(imagefilelenth, fext);
+                if (k == 0)
+                    return;
+
+                byte[] imgarray = new byte[imagefilelenth];
+
+                HttpPostedFile image = FileUpload1.PostedFile;
+                image.InputStream.Read(imgarray, 0, imagefilelenth);
+
+
+                byte[] signaturearray = (byte[])dt.Rows[0]["CustomerSignature"];
+
+                if (FileUpload2.HasFile)
+                {
+                    fname = FileUpload2.FileName;
+                    fext = Path.GetExtension(fname);
+                    fext = fext.ToLower();
+
+                    int signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+                    int j = CheckFileSize(signaturefilelenth, fext);
+                    if (j == 0)
+                        return;
+
+                    signaturearray = new byte[signaturefilelenth];
+
+                    HttpPostedFile signature = FileUpload2.PostedFile;
+                    signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+
+
+
+
+
+                }
+                int n = oImageAndSignatureDAO.InsertCustomerImageAndSignatureHistory(imgarray, signaturearray, customerDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString());
+                int i = oImageAndSignatureDAO.UpdateCustomerImageAndSignature(imgarray, signaturearray, customerDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString());
+                imagebindGrid();
+
+
+
+
+
+            }
+            else if (FileUpload2.HasFile)
+            {
+                int signaturefilelenth = FileUpload2.PostedFile.ContentLength;
+                byte[] signaturearray = new byte[signaturefilelenth];
+
+                HttpPostedFile signature = FileUpload2.PostedFile;
+                signature.InputStream.Read(signaturearray, 0, signaturefilelenth);
+                string fname = FileUpload2.FileName;
+                string fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+                int j = CheckFileSize(signaturefilelenth, fext);
+                if (j == 0)
+                    return;
+                byte[] imgarray = (byte[])dt.Rows[0]["CustomerImage"];
+                fname = FileUpload1.FileName;
+                fext = Path.GetExtension(fname);
+                fext = fext.ToLower();
+                if (FileUpload1.HasFile)
+                {
+                    int imagefilelenth = FileUpload1.PostedFile.ContentLength;
+                    imgarray = new byte[imagefilelenth];
+                    int k = CheckFileSize(imagefilelenth, fext);
+                    if (k == 0)
+                        return;
+                    HttpPostedFile image = FileUpload1.PostedFile;
+                    image.InputStream.Read(imgarray, 0, imagefilelenth);
+                }
+                int n = oImageAndSignatureDAO.InsertCustomerImageAndSignatureHistory(imgarray, signaturearray, customerDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString());
+                int i = oImageAndSignatureDAO.UpdateCustomerImageAndSignature(imgarray, signaturearray, customerDropDownList.SelectedValue.ToString(), DateTime.Now.ToShortDateString());
+                imagebindGrid();
+            }
+        }
+      
+
+       
+       
+        //string confirmValue = Request.Form["confirm_value"];
+        //if (confirmValue == "Yes")
+        //{
+        //    //Your logic for OK button
+        //}
+        //else
+        //{
+        //    //Your logic for cancel button
+        //}
+        //string condition = " where CustomerID='" + customerDropDownList.SelectedValue + "'";
+        //DataTable dt = oCustomerDAO.GetCustomerImageAndSignature(condition);
+        //ScriptManager.RegisterClientScriptBlock(this, GetType(), "__Mensagem", "if (Confirm()){$(\"#" + Button1.ClientID + "\").click();}", true);
+        ////if(ScriptManager.RegisterStartupScript(this.Page, Page.GetType(), "text", "Confirm()", true));
+        // confirmValue = Request.Form["confirm_value"];
+        //if (confirmValue == null)
+        //    return;
+        ////string confirmValue = Request.Form["confirm_value"];
+        ////ClientScript.RegisterStartupScript(GetType(), "messagebox", "<script language='javascript' type='text/javascript'>confirm('Do you want to save the WH XML file created?');</script>");
+        //if (dt.Rows.Count > 0)
+        //{
+        //    Response.Write("<script>Confirm();</script>");
+        //    confirmValue = Request.Form["confirm_value"];
+        //}
+        //return;
+
+    }
+    protected void customerDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        imagebindGrid();
+    }
+}

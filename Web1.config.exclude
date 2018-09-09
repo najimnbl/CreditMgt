@@ -1,0 +1,20 @@
+﻿<?xml version="1.0"?>
+
+<configuration>
+  <system.web>
+    <httpRuntime requestValidationMode="2.0" />
+    
+    <compilation debug="true" targetFramework="4.0" />
+    <!--<httpRuntime executionTimeout="240" maxRequestLength="20480" />-->
+  </system.web>
+
+  <system.webServer>
+     <modules runAllManagedModulesForAllRequests="true"/>
+  </system.webServer>
+
+  <appSettings>
+    <add key="DBConnectionString"
+         value="Data Source=USER-HP\NBL;Initial Catalog=AFileStorageDB;
+          User Id=abc;Password=sys123;pooling=false"/>
+  </appSettings>
+</configuration>

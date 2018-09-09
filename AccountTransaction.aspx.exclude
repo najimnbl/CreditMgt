@@ -1,0 +1,432 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="AccountTransaction.aspx.cs" Inherits="AccountTransaction" %>
+<%@ Register assembly="AjaxControlToolkit" namespace="AjaxControlToolkit" tagprefix="cc1" %>
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" Runat="Server">
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" Runat="Server">
+    <center>
+<asp:UpdatePanel ID="updatePanel1" runat="server">
+<ContentTemplate>
+<table width="auto">
+    <cc1:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+    </cc1:ToolkitScriptManager>
+    <tr>
+        <td>
+&nbsp;</td>
+    </tr>
+<tr>
+<td>
+
+<fieldset>
+<table>
+
+<tr>
+<td><label>Entry Type</label></td>
+<td>:</td>
+<td> <asp:DropDownList ID="entryTypeDropDownList" runat="server" 
+        DataSourceID="SqlDataSource1" DataTextField="TypeName" 
+        DataValueField="TranTypeSL">
+    </asp:DropDownList>
+    <asp:SqlDataSource ID="SqlDataSource1" runat="server" 
+        ConnectionString="<%$ ConnectionStrings:ApplicationServices %>" 
+        SelectCommand="SELECT * FROM [tblTransactionType]"></asp:SqlDataSource>
+    </td>
+<td>
+    &nbsp;</td>
+</tr>
+<tr>
+<td><label>Voucher</label></td>
+<td>:</td>
+<td><asp:TextBox ID="voucherNoTextBox" runat="server"></asp:TextBox> </td>
+<td>
+    &nbsp;</td>
+</tr>
+<tr>
+<td><label>Voucher Date</label></td>
+<td>:</td>
+<td><asp:TextBox ID="voucherDateTextBox" runat="server"></asp:TextBox>
+  <cc1:calendarextender ID="fromDateCalendar" PopupButtonID="imgPopup" 
+        runat="server" TargetControlID="voucherDateTextBox"
+        Format="dd/MM/yyyy"></cc1:calendarextender>
+</td>
+</tr>
+<tr>
+<td><label>Particulars</label></td>
+<td>:</td>
+<td colspan="5"><asp:TextBox ID="particularsTextBox" runat="server" Width="320px"></asp:TextBox></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td><asp:Button ID="createVoucherButton" runat="server" Text="New Voucher" 
+    onclick="createVoucherButton_Click" />
+    <asp:Button ID="searchButton" runat="server" onclick="searchButton_Click" 
+        Text="Search" />
+    </td>
+<td>
+    &nbsp;</td>
+</tr>
+</table>
+</fieldset>
+<fieldset>
+<table>
+<tr>
+<td><label>Account Type</label></td>
+<td>:</td>
+<td colspan="5">
+    <asp:RadioButton ID="coaRadioButton" Checked="true" runat="server" AutoPostBack="true" 
+        GroupName="a" Text="Chart Of Account" 
+        oncheckedchanged="coaRadioButton_CheckedChanged" /><asp:RadioButton ID="clintRadioButton"
+        runat="server" Text="Client" GroupName="a" AutoPostBack="true" 
+        oncheckedchanged="clintRadioButton_CheckedChanged" /></td>
+</tr>
+<tr>
+<td><label>A/C No</label></td>
+<td>:</td>
+<td>
+    <asp:DropDownList ID="accountNoDropDownList" runat="server" AutoPostBack="true" 
+        onselectedindexchanged="accountNoDropDownList_SelectedIndexChanged">
+    </asp:DropDownList>
+    <cc1:ListSearchExtender ID="ListSearchExtender2" runat="server" TargetControlID="accountNoDropDownList">
+            </cc1:ListSearchExtender>
+    </td>
+<%--<td><label>AC Name</label></td>
+<td>:</td>
+<td><asp:Label ID="accountNameLabel" runat="server"></asp:Label></td>--%>
+</tr>
+<tr>
+<td><label>Trans Mode</label></td>
+<td>:</td>
+<td> <asp:DropDownList ID="transModeDropDownList" runat="server" AutoPostBack="true"
+        onselectedindexchanged="transModeDropDownList_SelectedIndexChanged">
+    <asp:ListItem Value="1">Cash</asp:ListItem>
+    <asp:ListItem Value="2">Bank</asp:ListItem>
+    </asp:DropDownList></td>
+</tr>
+<tr id="bankRow" runat="server" visible="false">
+<td><label>Bank</label></td>
+<td>:</td>
+<td> <asp:DropDownList ID="bankDropDownList" runat="server"  AutoPostBack="true"
+        onselectedindexchanged="bankDropDownList_SelectedIndexChanged">
+    
+    </asp:DropDownList></td>
+</tr>
+
+<tr id="branchRow" runat="server" visible="false">
+<td><label>Branch</label></td>
+<td>:</td>
+<td> <asp:DropDownList ID="branchDropDownList" runat="server">
+    
+    </asp:DropDownList></td>
+</tr>
+<tr id="bankAccNoRow" runat="server" visible="false">
+<td><label>Bank Account No</label></td>
+<td>:</td>
+<td><asp:TextBox ID="bankAccNoTextBox" runat="server"></asp:TextBox></td>
+</tr>
+<tr id="chequeNoRow" runat="server" visible="false">
+<td><label>Cheque No</label></td>
+<td>:</td>
+<td><asp:TextBox ID="chequeNoTextBox" runat="server"></asp:TextBox></td>
+</tr>
+<tr id="chequeDateRow" runat="server" visible="false">
+<td><label>Checque Date</label></td>
+<td>:</td>
+<td><asp:TextBox ID="chequeDateTextBox" runat="server"></asp:TextBox>
+  <cc1:calendarextender ID="Calendarextender1" PopupButtonID="imgPopup" 
+        runat="server" TargetControlID="chequeDateTextBox"
+        Format="dd/MM/yyyy"></cc1:calendarextender>
+</td>
+</tr>
+<tr>
+<td><label>Tran Type</label></td>
+<td>:</td>
+<td> <asp:DropDownList ID="tranTypeDropDownList" runat="server">
+    <asp:ListItem>Debit</asp:ListItem>
+    <asp:ListItem>Credit</asp:ListItem>
+    
+    </asp:DropDownList></td>
+</tr>
+<tr>
+<td><label>Amount</label></td>
+<td>:</td>
+<td><asp:TextBox ID="amountTextBox" runat="server"></asp:TextBox></td>
+</tr>
+
+<tr>
+<td></td>
+<td>:</td>
+<td align="left" ><asp:Button ID="saveButton" runat="server" Text="Add" 
+        onclick="saveButton_Click" /></td>
+</tr>
+</table>
+
+</fieldset>
+<table>
+<tr>
+<td>
+  <asp:GridView ID="GridView1" runat="server" DataKeyNames="CoAccNo"
+                    AutoGenerateColumns="false" 
+                   
+                 
+                    OnRowDeleting="GridView1_RowDeleting" 
+        onrowdatabound="GridView1_RowDataBound" ShowFooter="True" 
+        onrowcreated="GridView1_RowCreated"> 
+     
+                    <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                  <%-- <FooterStyle CssClass="footer1" />--%>
+                    <Columns>
+     <%--<asp:ButtonField   Text="SingleClick" CommandName="SingleClick"  />--%>
+                        <asp:TemplateField Visible="false">
+                          
+                            <ItemTemplate>
+                                <asp:Label ID="VoucherNoLabel" runat="server" Text='<%#Eval("VoucherNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                          <asp:TemplateField Visible="false">
+                          
+                            <ItemTemplate>
+                                <asp:Label ID="idLabel" runat="server" Text='<%#Eval("TranAccSL") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="AccountNo">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="bankNameTextBox" runat="server" 
+                                    Text='<%#Eval("BankName") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="AccountNoLabel" runat="server" 
+                                    Text='<%#Eval("CoAccNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                           <asp:TemplateField HeaderText="IsClient" Visible="false">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="bankNameTextBox" runat="server" 
+                                    Text='<%#Eval("BankName") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="IsClientLabel" runat="server" 
+                                    Text='<%#Eval("IsClient") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Trans Mode">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="TransModeTextBox" runat="server" 
+                                    Text='<%#Eval("TransModeID") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="TransModeLabel" runat="server" 
+                                    Text='<%#Eval("TMode") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                          <asp:TemplateField HeaderText="Bank Name">
+                          <%--  <EditItemTemplate>
+                                <asp:TextBox ID="BankIDTextBox" runat="server" 
+                                    Text='<%#Eval("BankID") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="BankNameLabel" runat="server" 
+                                    Text='<%#Eval("BankName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Branch Name">
+                          <%--  <EditItemTemplate>
+                                <asp:TextBox ID="BranchIDTextBox" runat="server" 
+                                    Text='<%#Eval("BranchID") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="BranchNameLabel" runat="server" 
+                                    Text='<%#Eval("BranchName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                         <asp:TemplateField  HeaderText="Bank Acc No">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="BranchAddressTextBox" runat="server" 
+                                    Text='<%#Eval("ChequeNo") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="BankAccNoLabel" runat="server" 
+                                    Text='<%#Eval("BankAccNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField  HeaderText="Cheque No">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="BranchAddressTextBox" runat="server" 
+                                    Text='<%#Eval("ChequeNo") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="ChequeNoLabel" runat="server" 
+                                    Text='<%#Eval("ChequeNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                          <asp:TemplateField  HeaderText="Cheque Date">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="BranchAddressTextBox" runat="server" 
+                                    Text='<%#Eval("ChequeNo") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="ChequeDateLabel" runat="server" 
+                                    Text='<%#Eval("ChequeDate") %>'></asp:Label>
+                            </ItemTemplate>
+                            <%-- <FooterTemplate>
+<asp:Label ID="lbltxttotal" runat="server" Text="Total Amount"/>
+</FooterTemplate>--%>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Debit">
+                          
+                            <ItemTemplate>
+                                <asp:Label ID="DebitLabel" runat="server" 
+                                    Text='<%#Eval("Debit") %>'></asp:Label>
+                            </ItemTemplate>
+                            <%-- <EditItemTemplate>
+                                <asp:TextBox ID="DebitTextBox" runat="server" 
+                                    Text='<%#Eval("Debit") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                             <FooterTemplate>
+                    <asp:Label ID="debitTotalLabel" runat="server" ></asp:Label>
+                </FooterTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Credit">
+                           
+                            <ItemTemplate>
+                                <asp:Label  ID="CreditLabel" runat="server" 
+                                    Text='<%#Eval("Credit") %>' ></asp:Label>
+                            </ItemTemplate>
+                              <%--<EditItemTemplate>
+                                <asp:TextBox ID="CreditTextBox" runat="server" 
+                                    Text='<%#Eval("Credit") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                              <FooterTemplate>
+                    <asp:Label ID="creditTotalLabel" runat="server"></asp:Label>
+                </FooterTemplate>
+                        </asp:TemplateField>
+                      
+                      
+                        <asp:CommandField ShowDeleteButton="true" />
+                    </Columns>
+                   
+                  
+                    <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                    
+                   
+                </asp:GridView>
+
+</td>
+</tr>
+<tr>
+<td>
+  <asp:GridView ID="GridView2" Visible="false" runat="server" DataKeyNames="CoAccNo"
+                    AutoGenerateColumns="false" 
+                   
+                 
+                   ShowFooter="True" 
+
+       
+        onrowdeleting="GridView2_RowDeleting" onrowcreated="GridView2_RowCreated" onrowdatabound="GridView2_RowDataBound" 
+        > 
+     
+                    <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                  <%-- <FooterStyle CssClass="footer1" />--%>
+                    <Columns>
+     <%--<asp:ButtonField   Text="SingleClick" CommandName="SingleClick"  />--%>
+                        <asp:TemplateField Visible="false">
+                          
+                            <ItemTemplate>
+                                <asp:Label ID="VoucherNoLabel" runat="server" Text='<%#Eval("VoucherNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                          <asp:TemplateField Visible="false">
+                          
+                            <ItemTemplate>
+                                <asp:Label ID="idLabel" runat="server" Text='<%#Eval("TranAccSL") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="AccountNo">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="bankNameTextBox" runat="server" 
+                                    Text='<%#Eval("BankName") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="AccountLabel" runat="server" 
+                                    Text='<%#Eval("AccountNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                          <asp:TemplateField HeaderText="AccountNo" Visible="false">
+                            <%--<EditItemTemplate>
+                                <asp:TextBox ID="bankNameTextBox" runat="server" 
+                                    Text='<%#Eval("BankName") %>'></asp:TextBox>
+                            </EditItemTemplate>--%>
+                            <ItemTemplate>
+                                <asp:Label ID="COALabel" runat="server" 
+                                    Text='<%#Eval("CoAccNo") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                         
+                      
+                      
+                       
+                       
+                       
+                       
+                        
+                        <asp:TemplateField HeaderText="Debit">
+                          
+                           <%-- <ItemTemplate>
+                                <asp:Label ID="DebitLabel" runat="server" 
+                                    Text='<%#Eval("Debit") %>'></asp:Label>
+                            </ItemTemplate>--%>
+                             <ItemTemplate>
+                                <asp:TextBox ID="DebitTextBox" runat="server" AutoPostBack="true" OnTextChanged="DebitTextBox_TextChanged" 
+                                    Text='<%#Eval("Debit") %>'></asp:TextBox>
+                            </ItemTemplate>
+                             <FooterTemplate>
+                    <asp:Label ID="debitTotalLabel" runat="server" ></asp:Label>
+                </FooterTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Credit">
+                           
+                            <%--<ItemTemplate>
+                                <asp:Label  ID="CreditLabel" runat="server" 
+                                    Text='<%#Eval("Credit") %>' ></asp:Label>
+                            </ItemTemplate>--%>
+                              <ItemTemplate>
+                                <asp:TextBox ID="CreditTextBox" runat="server" AutoPostBack="true" OnTextChanged="CreditTextBox_TextChanged" 
+                                    Text='<%#Eval("Credit") %>'></asp:TextBox>
+                            </ItemTemplate>
+                              <FooterTemplate>
+                    <asp:Label ID="creditTotalLabel" runat="server" ></asp:Label>
+                </FooterTemplate>
+                        </asp:TemplateField>
+                      
+                    <%--  <asp:CommandField ShowEditButton="true" />--%>
+                        <asp:CommandField ShowDeleteButton="true" />
+                    </Columns>
+                   
+                  
+                    <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                    
+                   
+                </asp:GridView>
+
+</td>
+</tr>
+<tr>
+<td align="left">
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;
+    <asp:Button ID="insertButton" runat="server" Visible="false" Text="Save" 
+        onclick="insertButton_Click" /></td>
+</tr>
+</table>
+</td>
+</tr>
+<tr><td></td></tr>
+</table>
+</ContentTemplate>
+</asp:UpdatePanel>
+
+
+</center>
+    
+</asp:Content>
+

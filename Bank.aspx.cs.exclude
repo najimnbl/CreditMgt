@@ -1,0 +1,134 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class Bank : System.Web.UI.Page
+{
+    BankInformationDAO oBankInformationDAO = new BankInformationDAO();
+    BankInformationEntity oBankInformationEntity = new BankInformationEntity();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            gridViewBind();
+        }
+    }
+    protected void btnBSave_Click(object sender, EventArgs e)
+    {
+        oBankInformationEntity = new BankInformationEntity();
+        //oBankInformationEntity.Bankid = Convert.ToInt16(banKIdTextBox.Text);
+        oBankInformationEntity.BankName =txtBankName.Text;
+        oBankInformationEntity.BankRemarks =txtBankRemarks.Text;
+        string condition = " where BankName='" + oBankInformationEntity.BankName + "'";
+        DataTable dt = oBankInformationDAO.GetBank(condition);
+        string message = "";
+        if (dt.Rows.Count == 0)
+        {
+            int i = oBankInformationDAO.InsertBank(oBankInformationEntity);
+            if (i == 1)
+                message = "Data Inserted Successfully";
+            else
+                message = "Data Not Inserted!";
+           
+        }
+        else
+        {
+            message = "Bank Alreay in DataBase";
+        }
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('"+message+"')", true);
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        GridView1.PageIndex = e.NewPageIndex;
+        gridViewBind();
+        //GridView1.DataSource = oCollectionAccount.GetCustomer(Session["brCode"].ToString(), "");
+        //GridView1.DataBind();
+
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+        //int customerId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        //        //getting row field details
+        TextBox bankNameTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("bankNameTextBox");
+        //TextBox banKIdTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("idTextBox");
+        TextBox bankRemarksTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("bankRemarksTextBox");
+        oBankInformationEntity = new BankInformationEntity();
+        oBankInformationEntity.Bankid =  Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        oBankInformationEntity.BankName = bankNameTextBox.Text;
+        oBankInformationEntity.BankRemarks = bankRemarksTextBox.Text;
+        int i = oBankInformationDAO.UpdateBank(oBankInformationEntity);
+        string message = "";
+        GridView1.EditIndex = -1;
+      
+       
+        if (i == 1)
+            message = "Data Updated Successfully";
+        else
+            message = "Data Not Updated!";
+
+        gridViewBind();
+
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        
+        oBankInformationEntity = new BankInformationEntity();
+         oBankInformationDAO = new BankInformationDAO();
+         oBankInformationEntity.Bankid = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oBankInformationDAO.DeleteBank(oBankInformationEntity);
+
+        GridView1.EditIndex = -1;
+     
+
+        string message = ""; 
+        if (i == 1)
+            message = "Data Deleted Successfully";
+        else
+            message = "Data Not Deleted!";
+
+        gridViewBind();
+
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+
+        // gvbind();
+
+    }
+
+    private void gridViewBind()
+    {
+        oBankInformationDAO = new BankInformationDAO();
+        string condition = " order by BankId desc";
+        DataTable dt = oBankInformationDAO.GetBank(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    protected void txtNew_Click(object sender, EventArgs e)
+    {
+        txtBankName.Text = "";
+        txtBankRemarks.Text = "";
+    }
+}

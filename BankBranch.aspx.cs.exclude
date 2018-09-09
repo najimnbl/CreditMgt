@@ -1,0 +1,170 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class BankBranch : System.Web.UI.Page
+{
+    BankInformationDAO oBankInformationDAO = new BankInformationDAO();
+    BankInformationEntity oBankInformationEntity = new BankInformationEntity();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            gridViewBind();
+            dropDownListBind();
+        }
+    }
+
+    private void dropDownListBind()
+    {
+        string condition = " order by BankName";
+        DataTable dt = oBankInformationDAO.GetBank(condition);
+        drpBankName.DataValueField = "BankId";
+        drpBankName.DataTextField = "BankName";
+        drpBankName.DataSource = dt;
+        drpBankName.DataBind();
+       
+    }
+    protected void btnBSave_Click(object sender, EventArgs e)
+    {
+        oBankInformationEntity = new BankInformationEntity();
+        //oBankInformationEntity.Bankid = Convert.ToInt16(banKIdTextBox.Text);
+        oBankInformationEntity.Bankid =Convert.ToInt16(drpBankName.SelectedValue);
+        oBankInformationEntity.BranchCode =txtBranchCode.Text;
+        oBankInformationEntity.BranchName = txtBranchName.Text;
+        oBankInformationEntity.BranchRoutingCode = txtRoutingCode.Text;
+        oBankInformationEntity.BranchLastModifieddBy = "";
+        oBankInformationEntity.BranchCreateBy = "";                                //session["userId"] needed
+        oBankInformationEntity.BranchAddress = txtBranchAddress.Text;
+        oBankInformationEntity.BranchRemarks = txtBranchRemarks.Text;
+        string condition = " where Bankid='" + oBankInformationEntity.Bankid + "' and BranchName='"+oBankInformationEntity.BranchName+"'";
+        DataTable dt = oBankInformationDAO.GetBankBranch(condition);
+        string message = "";
+        if (dt.Rows.Count == 0)
+        {
+            int i = oBankInformationDAO.InsertBankBranch(oBankInformationEntity);
+            if (i == 1)
+                message = "Data Inserted Successfully";
+            else
+                message = "Data Not Inserted!";
+
+        }
+        else
+        {
+            message = "Branch Alreay in DataBase";
+        }
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        GridView1.PageIndex = e.NewPageIndex;
+        gridViewBind();
+        //GridView1.DataSource = oCollectionAccount.GetCustomer(Session["brCode"].ToString(), "");
+        //GridView1.DataBind();
+
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+        //int customerId = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        //        //getting row field details
+        TextBox BranchCodeTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("branchCodeTextBox");
+        //TextBox banKIdTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("idTextBox");
+        TextBox BranchRemarksTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("BranchRemarksTextBox");
+        TextBox BranchRoutingCodeTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("BranchRoutingCodeTextBox");
+        TextBox BranchAddressTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("BranchAddressTextBox");
+        TextBox BranchNameTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("BranchNameTextBox");
+        //TextBox BranchRemarksTextBox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("BranchRemarksTextBox");
+        oBankInformationEntity = new BankInformationEntity();
+        oBankInformationEntity.BranchID = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        oBankInformationEntity.BranchCode = BranchCodeTextBox.Text;
+        oBankInformationEntity.BranchRemarks = BranchRemarksTextBox.Text;
+        oBankInformationEntity.BranchName = BranchNameTextBox.Text;
+        oBankInformationEntity.BranchAddress = BranchAddressTextBox.Text;
+        oBankInformationEntity.BranchRoutingCode = BranchRoutingCodeTextBox.Text;
+        oBankInformationEntity.BranchLastModifieddBy = "";//session["userId"] needed
+        int i = oBankInformationDAO.UpdateBankBranch(oBankInformationEntity);
+        string message = "";
+        GridView1.EditIndex = -1;
+
+
+        if (i == 1)
+            message = "Data Updated Successfully";
+        else
+            message = "Data Not Updated!";
+
+        gridViewBind();
+
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+        oBankInformationEntity = new BankInformationEntity();
+        oBankInformationDAO = new BankInformationDAO();
+        oBankInformationEntity.BranchID = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oBankInformationDAO.DeleteBankBranch(oBankInformationEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+            message = "Data Deleted Successfully";
+        else
+            message = "Data Not Deleted!";
+
+        gridViewBind();
+
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+
+        // gvbind();
+
+    }
+
+    private void gridViewBind()
+    {
+        oBankInformationDAO = new BankInformationDAO();
+        string condition = " order by BranchId desc";
+        DataTable dt = oBankInformationDAO.GetBankBranch(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    protected void txtNew_Click(object sender, EventArgs e)
+    {
+        txtBranchRemarks.Text = "";
+        txtBranchName.Text = "";
+        txtBranchCode.Text = "";
+        txtBranchAddress.Text = "";
+    }
+    protected void txtNew_Click1(object sender, EventArgs e)
+    {
+        txtBranchRemarks.Text = "";
+        txtBranchName.Text = "";
+        txtBranchCode.Text = "";
+        txtBranchAddress.Text = "";
+        txtRoutingCode.Text = "";
+    }
+}

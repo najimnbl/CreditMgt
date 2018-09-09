@@ -1,0 +1,207 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="SiteMaster" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head runat="server">
+    <title></title>
+    <link href="~/Styles/Site.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server">
+    </asp:ContentPlaceHolder>
+    <style type="text/css">
+        #Img1
+        {
+            margin-left: 0px;
+        }
+    </style>
+</head>
+<body>
+    <form runat="server">
+    <div class="page">
+        <div class="header">
+            <div class="title" >
+                
+                    
+                        <h1>
+                            <img id="Img1" src="~/image/nationalbank logo.png" height="72" width="326" style="margin-left:30px" runat="server" />
+                        </h1>
+                    
+                
+                
+                <h2 >
+
+                   <center>          
+                  Credit Approval Management System
+                 </center>
+                </h2>
+            
+            </div>
+
+
+            <div    >
+                <table align="right">
+                    <tr>
+                       
+                        <td><asp:Label id="Label1" runat="server" ForeColor="#005C1F"></asp:Label></td>
+                        
+                    </tr>
+                    <tr>
+                       
+                        <td><asp:Label id="Label2" runat="server" ForeColor="#005C1F"></asp:Label></td>
+                        
+                    </tr>
+                   
+              
+              
+                </table>
+                
+                
+                <%--<asp:Button ID="btnLogOut" runat="server" Text="Logout" />--%>
+               
+            </div>
+
+
+            <%--<div class="loginDisplay">
+                <asp:LoginView ID="HeadLoginView" runat="server" EnableViewState="false">
+                    <AnonymousTemplate>
+                     [ <a href="~/Account/Login.aspx" ID="HeadLoginStatus" runat="server">Log In</a> ]
+               
+                   
+                   
+                    </AnonymousTemplate>
+                    <LoggedInTemplate>
+                        Welcome <span class="bold"><asp:LoginName ID="HeadLoginName" runat="server" /></span>!
+                        [ <asp:LoginStatus ID="HeadLoginStatus" runat="server" LogoutAction="Redirect" LogoutText="Log Out" LogoutPageUrl="~/"/> ]
+                    </LoggedInTemplate>
+                </asp:LoginView>
+            </div>--%>
+           
+           
+            <div class="clear hideSkiplink"  >
+                <asp:Menu ID="NavigationMenu" runat="server" CssClass="menu" EnableViewState="false" IncludeStyleBlock="false" Orientation="Horizontal">
+                    <Items>
+ 
+
+                        <asp:MenuItem NavigateUrl="~/Home.aspx" Text="Home"/>
+                           <asp:MenuItem Text="Admin" Value="File">
+                            <asp:MenuItem NavigateUrl="~/EmployeeInfo.aspx"    Text="Employee Entry" ></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/UserInfo.aspx"   Text="Create User" ></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/UserAssignRights.aspx"   Text="User Assign Rights" ></asp:MenuItem> 
+                            <%--<asp:MenuItem NavigateUrl="~/MenuAndSubMenu.aspx"   Text="Menu & Sub Menu" ></asp:MenuItem>--%>
+                             <asp:MenuItem NavigateUrl="~/UserWiseBranchAccess.aspx"   Text="User Wise Branch Access" ></asp:MenuItem>
+                            
+
+                            </asp:MenuItem>
+
+                          <asp:MenuItem Text="Credit Management" Value="File">
+                            <asp:MenuItem NavigateUrl="~/LoanAplication.aspx" Value="Loan Aplication"    Text="Loan Aplication" ></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/LoanDocumentChecklist.aspx" Value="Loan Document Checklist"    Text="Loan Document Checklist" ></asp:MenuItem>
+                            
+                         
+
+                             <asp:MenuItem NavigateUrl="~/LoanAplicationINformation.aspx" Value="Loan Aplication Information"    Text="Loan Aplication Information" ></asp:MenuItem>
+                            
+                            <%-- <asp:MenuItem NavigateUrl="~/LoanComments.aspx" Value="Loan Aplication Comments"    Text="Loan Aplication Comments" ></asp:MenuItem>--%>
+                          
+                           <asp:MenuItem NavigateUrl="~/LoanAplicationCommentsInformation.aspx" Value="Loan Aplication Comments Information"    Text="Loan Aplication Comments Informatio" ></asp:MenuItem>
+                          
+                           <%--<asp:MenuItem NavigateUrl="~/Default.aspx" Value="GetFile"    Text="Loan Document 1" ></asp:MenuItem>--%>
+
+                           <asp:MenuItem NavigateUrl="~/AplicationDocumentUpload.aspx" Value="GetFile"    Text="Loan Document" ></asp:MenuItem>
+                           
+                          <asp:MenuItem NavigateUrl="~/AplicationFinancial.aspx" Value="Aplication Financial"    Text="Aplication Financial" ></asp:MenuItem>
+
+                           <asp:MenuItem NavigateUrl="~/AplicationFinancialInformation.aspx" Value="Aplication Financial Information"    Text="Aplication Financial Information" ></asp:MenuItem>
+
+                       
+                           <asp:MenuItem NavigateUrl="~/LoanAplicationModifiedHistory.aspx" Value="LoanAplication Modified History"    Text="LoanAplication Modified History" ></asp:MenuItem>
+                           
+                           
+                            <%--<asp:MenuItem NavigateUrl="~/Customer.aspx"   Text="Customer Entry" ></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/Nominee.aspx"   Text="Nominee Entry" ></asp:MenuItem> 
+                            <asp:MenuItem NavigateUrl="~/Guardian.aspx"   Text="Guardian Entry" ></asp:MenuItem>
+                            <asp:MenuItem  Text="Image Upload" >
+                            <asp:MenuItem NavigateUrl="~/CustomerImageUpload.aspx"   Text="Customer Image & signature" ></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/NomineeImageAndSignature.aspx"   Text="Nominee Image & signature" ></asp:MenuItem>
+                            <asp:MenuItem NavigateUrl="~/GurdianImageAndSignature.aspx"   Text="Gurdian Image & signature" ></asp:MenuItem> 
+                            </asp:MenuItem>
+                            ASPNetFileUpDownLoad.csproj
+                             <asp:MenuItem Text="Other" ></asp:MenuItem>--%>
+                           </asp:MenuItem>
+
+                          
+                          
+                <%--          <asp:MenuItem Text="Setting" Value="File">
+
+                                <asp:MenuItem  Text="Bank" >
+                                <asp:MenuItem NavigateUrl="~/Bank.aspx"   Text="Bank Entry" > </asp:MenuItem>
+                                <asp:MenuItem NavigateUrl="~/BankBranch.aspx"   Text="Bank Branch Entry" >  </asp:MenuItem>
+                                 
+                                </asp:MenuItem>
+
+                                <asp:MenuItem NavigateUrl="~/ChargeCategory.aspx"   Text="Charge Category Entry" >  </asp:MenuItem>
+                                <asp:MenuItem NavigateUrl="~/ChargeItem.aspx"   Text="Charge Item Entry" >  </asp:MenuItem>
+                                <asp:MenuItem NavigateUrl="~/ChargeConfigaretion.aspx"   Text="Charge Configaretion Entry">  </asp:MenuItem>
+                                <asp:MenuItem NavigateUrl="~/ClientType.aspx"   Text="Client Type Entry">  </asp:MenuItem>
+                                 <asp:MenuItem NavigateUrl="~/ClientTransactionRole.aspx"   Text="Client Transaction Role">  </asp:MenuItem>
+                          </asp:MenuItem>
+                           
+                        <asp:MenuItem Text ="Acounting" Value="File">
+                        <asp:MenuItem NavigateUrl="~/GroupAccount.aspx"   Text="Account Group Entry" >  </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/SubGroupAccount.aspx"   Text="Sub Group Account" >  </asp:MenuItem>
+                        
+                        <asp:MenuItem NavigateUrl="~/AccountGroupReport.aspx"   Text="Account Group for Report" >  </asp:MenuItem>
+                        <asp:MenuItem NavigateUrl="~/ChartOfAccount.aspx"   Text="Chart Of Account" >  </asp:MenuItem> 
+                        
+                        </asp:MenuItem>
+                         
+                          <asp:MenuItem Text ="Transaction" Value="File">
+                        <asp:MenuItem NavigateUrl="~/AccountTransaction.aspx"   Text="Transaction Account" >  </asp:MenuItem>
+                           <asp:MenuItem NavigateUrl="~/TransactionApprove.aspx"   Text="Transaction Approve" >  </asp:MenuItem>                       
+                        
+                        </asp:MenuItem>--%>
+                        
+                       
+                        <asp:MenuItem Text ="Search" Value="File">
+                           
+                            <asp:MenuItem NavigateUrl="~/SearchContant.aspx" Text="Aplication Content Search" ></asp:MenuItem>
+                            </asp:MenuItem>
+
+
+                            <asp:MenuItem Text ="Reports" Value="File">
+                           
+                                <asp:MenuItem NavigateUrl="~/rptBranchWiseLoanStatus.aspx" Text="Branch Wise Aproved Loan Status" ></asp:MenuItem>
+                                <asp:MenuItem NavigateUrl="~/rptBranchWiseLoanStatusDecline.aspx" Text="Branch Wise Decline Loan Status" ></asp:MenuItem>
+                                <asp:MenuItem NavigateUrl="~/rptGroupwiseLoanStatus.aspx" Text="Group Wise Aproved Loan Status" ></asp:MenuItem>
+
+                             
+                            </asp:MenuItem>
+
+                            
+                         
+                       
+                       
+                        <asp:MenuItem NavigateUrl="~/About.aspx" Text="About"/>
+                        <asp:MenuItem NavigateUrl="~/webLoagout.aspx" Text="Logout"/>
+
+                        
+                    </Items>
+                </asp:Menu>
+            </div>
+        </div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        
+        <h4 >
+        COPYRIGHT 2015 - NBL SOFTWARE DEVELOPMENT TEAM(ITD). ALL  RIGHT RESERVED.
+        </h4>
+
+    </div>
+    </form>
+</body>
+</html>

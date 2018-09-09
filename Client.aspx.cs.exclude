@@ -1,0 +1,368 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using CrystalDecisions.CrystalReports.Engine;
+using System.IO;
+
+public partial class Client : System.Web.UI.Page
+{
+
+    ReturnVal oRtnValue = new ReturnVal();
+
+    ClientEntity oClientEntity = new ClientEntity();
+    ClientDAO oClientDAO = new ClientDAO();
+
+    //BankInformationDAO oBankInformationDAO = new BankInformationDAO();
+    
+    
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+
+            string Clientid = oRtnValue.ReturnValue("tblClient", "", "", "isnull(MAX(ClientID),0000000)+1");
+            int value;
+            int.TryParse(Clientid, out value);
+            txtClientID.Text = value.ToString("D7");
+
+            LoadDropDownList();
+            gridViewBind();
+
+        }
+    }
+
+    private void LoadDropDownList()
+    {
+        DataTable dt = oClientDAO.GetClientIntroducer("");
+        if (dt.Rows.Count > 0)
+        {
+
+
+            drpIntroducer.DataSource = dt;
+            drpIntroducer.DataTextField = "ClientID";
+            drpIntroducer.DataValueField = "ClientID";
+            drpIntroducer.DataBind();
+        }
+
+
+        dt = new DataTable();
+        dt = oClientDAO.GetClientRole("");
+        if (dt.Rows.Count > 0)
+        {
+
+
+            drpRoleID.DataSource = dt;
+            drpRoleID.DataTextField = "RoleCode";
+            drpRoleID.DataValueField = "RoleCode";
+            drpRoleID.DataBind();
+        }
+
+
+
+        dt = new DataTable();
+        dt = oClientDAO.GetClientType("");
+        if (dt.Rows.Count > 0)
+        {
+
+
+            drpClientTypeCode.DataSource = dt;
+            drpClientTypeCode.DataTextField = "ClientTypeCode";
+            drpClientTypeCode.DataValueField = "ClientTypeCode";
+            drpClientTypeCode.DataBind();
+        }
+
+        dt = new DataTable();
+        dt = oClientDAO.GetClientChargeCategory("");
+        if (dt.Rows.Count > 0)
+        {
+
+
+            drpChareConfigaretionID.DataSource = dt;
+            drpChareConfigaretionID.DataTextField = "ChargeCategoryCode";
+            drpChareConfigaretionID.DataValueField = "ChargeCategoryCode";
+            drpChareConfigaretionID.DataBind();
+        }
+
+
+
+    }
+
+   
+   protected void txtCSave_Click(object sender, EventArgs e)
+    {
+
+        ClientEntity oClientEntity = new ClientEntity();
+        ClientDAO oClientDAO = new ClientDAO();
+
+
+        oClientEntity.ClientID = txtClientID.Text;
+        oClientEntity.ClientBIO = txtBIO.Text;
+       oClientEntity.MBHouseCode =txtMBHouseCode.Text ;
+       oClientEntity.ClientIntroducer =drpIntroducer.Text;
+       oClientEntity.RoleCode=drpRoleID.Text;
+       oClientEntity.ClientTypeCode=drpClientTypeCode.Text;
+       oClientEntity.ChargeCategoryCode=drpChareConfigaretionID.Text ;
+       oClientEntity.ClientPowerAtonyDetais =txtPAtony.Text ;
+       oClientEntity.ClientSpecialComissionRate=txtComisionRate.Text;
+       oClientEntity.ClientTransactionAccount=txtTransactionACNo.Text;
+       oClientEntity.AccountType=drpMBAccountType.Text;
+       oClientEntity.ClientCreateBy =DateTime.Now.ToShortDateString();
+       oClientEntity.ClientLastModified=DateTime.Now.ToShortDateString();
+       oClientEntity.AcccountOpeningDate=DateTime.Parse(txtACopeningDate.Text);
+
+
+
+       string condition = " where ClientID='" + oClientEntity.ClientID + "'";
+       DataTable dt = oClientDAO.GetClient(condition);
+        string message = "";
+        if (dt.Rows.Count == 0)
+        {
+            int i = oClientDAO.InsertClient(oClientEntity);
+            if (i == 1)
+            {
+                message = "Data Inserted Successfully";
+                Clear();
+            }
+            else
+                message = "Data Not  Inserted";
+
+        }
+        else
+        {
+            message = "Data Alreay in DataBase";
+        }
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        gridViewBind();
+        Clear();
+    }
+
+    public void Clear()
+    {
+
+
+
+        string Clientid = oRtnValue.ReturnValue("tblClient", "", "", "isnull(MAX(ClientID),0000000)+1");
+        int value;
+        int.TryParse(Clientid, out value);
+        txtClientID.Text = value.ToString("D7");
+
+        txtComisionRate.Text = "";
+        txtMBHouseCode.Text = "";
+        txtPAtony.Text = "";
+        txtACopeningDate.Text = "";
+        txtTransactionACNo.Text = "";
+        
+
+
+
+    }
+
+    private void gridViewBind()
+    {
+        //TransactionRoleDAO oTransactionRoleDAO = new TransactionRoleDAO();
+        string condition = " order by clientID ASC";
+        DataTable dt = oClientDAO.GetClientView(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        GridView1.PageIndex = e.NewPageIndex;
+        gridViewBind();
+        //GridView1.DataSource = oCollectionAccount.GetCustomer(Session["brCode"].ToString(), "");
+        //GridView1.DataBind();
+
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+        TextBox txtClSLTextbox = (TextBox)GridView1.Rows[e.RowIndex].FindControl("ClSLTextbox");
+        TextBox txtGClientBIO = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GClientBIO");
+        TextBox txtGClientIntroducerdrop = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GClientIntroducerdrop");
+        TextBox txtGMBHouseCode = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GMBHouseCode");
+        TextBox txtGRoleCodetxt = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GRoleCodetxt");
+        TextBox txtGClientTypeCodetxt = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GClientTypeCodetxt");
+        TextBox txtGChargeCategoryCodetxt = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GChargeCategoryCodetxt");
+        TextBox txtGClientSpecialComissionRatetxt = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GClientSpecialComissionRatetxt");
+        TextBox txtGClientTransactionAccounttxt = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GClientTransactionAccounttxt");
+        TextBox txtGAccountTypetxt = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GAccountTypetxt");
+       
+        ClientEntity oClientEntity = new ClientEntity();
+
+        oClientEntity.ClientBIO = txtGClientBIO.Text;
+        oClientEntity.MBHouseCode = txtGMBHouseCode.Text;
+        oClientEntity.ClientIntroducer = txtGClientIntroducerdrop.Text;
+        oClientEntity.RoleCode = txtGRoleCodetxt.Text;
+        oClientEntity.ClientTypeCode = txtGClientTypeCodetxt.Text;
+        oClientEntity.ChargeCategoryCode = txtGChargeCategoryCodetxt.Text;
+        oClientEntity.ClientSpecialComissionRate = txtGClientSpecialComissionRatetxt.Text;
+        oClientEntity.ClientTransactionAccount = txtGClientTransactionAccounttxt.Text;
+        oClientEntity.AccountType = txtGAccountTypetxt.Text;
+        oClientEntity.ClientLastModified = DateTime.Now.ToShortDateString();
+     
+
+        oClientEntity.ClSL = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oClientDAO.UpdateClient(oClientEntity);
+        string message = "";
+        GridView1.EditIndex = -1;
+
+        if (i == 1)
+            message = "Data Updated Successfully";
+        else
+            message = "Data Not Updated!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+
+        ClientDAO oClientDAO = new ClientDAO();
+        ClientEntity oClientEntity = new ClientEntity();
+
+        oClientEntity.ClSL = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        int i = oClientDAO.DeleteClient(oClientEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+            message = "Data Deleted Successfully";
+        else
+            message = "Data Not Deleted!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+
+        // gvbind();
+
+    }
+
+
+
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+            //oTransactionRoleDAO = new TransactionRoleDAO();
+            //oTransactionRoleEntity = new TransactionRoleEntity();
+            //oTransactionRoleEntity.RoleId = Convert.ToInt32(GridView1.DataKeys[e.Row.RowIndex].Value.ToString());
+
+            //string condition = " where RoleId='" + oTransactionRoleEntity.RoleId + "'";
+
+            //DataTable oDatTable=oTransactionRoleDAO(condition);
+            //DataTable dt = oChargeInformationDAO.GetChargeItem("");
+
+
+
+
+
+        }
+
+
+
+
+    }
+    protected void txtNew_Click(object sender, EventArgs e)
+    {
+        Clear();
+    }
+
+
+
+    protected void btnPrint_Click(object sender, EventArgs e)
+    {
+
+        LinkButton b = (LinkButton)sender;
+        GridViewRow row = (GridViewRow)b.NamingContainer;
+
+        CustomerDAO oCustomerDAO = new CustomerDAO();
+        NomineeDAO oNomineeDAO = new NomineeDAO();
+      
+        CustomerInformationDataSet oCustomerInformationDataSet = new CustomerInformationDataSet();
+        string clientId = ((Label)GridView1.Rows[row.RowIndex].FindControl("ClientID")).Text;
+        string condition = " where ClientID='" + clientId + "'";
+        oCustomerInformationDataSet.Tables["ClientWiseCustomer"].Merge(oCustomerDAO.GetClientWiseCustomer(clientId));
+        oCustomerInformationDataSet.Tables["Nominee"].Merge(oNomineeDAO.GetNominee(condition));
+        Session["ds"] = oCustomerInformationDataSet;
+        Response.Redirect("ReportViewer.aspx");
+        if (row != null)
+        {
+            //int index = row.RowIndex; //gets the row index selected
+            //int id = Convert.ToInt32(GridView1.DataKeys[index].Value.ToString());
+            //Label CustomerIDLabel = (Label)GridView1.Rows[index].FindControl("CustomerIDLabel");
+            //string customerId = CustomerIDLabel.Text;
+            //grab the values here
+            //string myVariable = row.Cells[1].Text;
+            //string condition = " where CuSL='" + id + "'";
+            //DataTable dt = oCustomerDAO.GetCustomer(condition);
+            //if (dt.Rows.Count > 0)
+            //{
+            //    txtCustomerID.Text = dt.Rows[0]["CustomerID"].ToString();
+            //    ChISCompany.Checked = Convert.ToBoolean(dt.Rows[0]["CustomerIsCompany"]);
+            //    txtname.Text = dt.Rows[0]["CustomerName"].ToString();
+            //    txtCustomerFaterName.Text = dt.Rows[0]["CustomerFatherName"].ToString();
+            //    txtMotherName.Text = dt.Rows[0]["CustomerMotherName"].ToString();
+            //    drpSex.SelectedValue = dt.Rows[0]["CustomerSex"].ToString();
+            //    drpMStatus.SelectedValue = dt.Rows[0]["CustomerMeritalStatus"].ToString();
+            //    txtDOB.Text = Convert.ToDateTime(dt.Rows[0]["CustomerDOB"]).ToString("dd/MM/yyyy");
+            //    drpReligion.SelectedValue = dt.Rows[0]["CustomerReligion"].ToString();
+
+            //    drpCountyID.SelectedValue = dt.Rows[0]["CountryID"].ToString();
+            //    txtMobile.Text = dt.Rows[0]["CustomerMobileNo"].ToString();
+            //    txtNID.Text = dt.Rows[0]["CustomerNID"].ToString();
+            //    txtPassport.Text = dt.Rows[0]["CustomerPassportNO"].ToString();
+            //    txtTIN.Text = dt.Rows[0]["CustomerTIN"].ToString();
+            //    txtEmail.Text = dt.Rows[0]["CustomerEmail"].ToString();
+            //    txtPadress.Text = dt.Rows[0]["CustomerPermanentAddress"].ToString();
+            //    txtPContact.Text = dt.Rows[0]["CustomerPermanentContact"].ToString();
+            //    PrAdress.Text = dt.Rows[0]["CustomerPresentAddress"].ToString();
+            //    PrContact.Text = dt.Rows[0]["CustomerPresentContact"].ToString();
+            //    txtMadress.Text = dt.Rows[0]["CustomerMailingAddress"].ToString();
+            //    MContact.Text = dt.Rows[0]["CustomerMailingContact"].ToString();
+            //    drpBankID.SelectedValue = dt.Rows[0]["Bankid"].ToString();
+            //    drpBankBranch.SelectedValue = dt.Rows[0]["BranchID"].ToString();
+            //    txtAcountNO.Text = dt.Rows[0]["CustomerBankAccount"].ToString();
+            //    drpMBClientID.SelectedValue = dt.Rows[0]["CustomerCleintID"].ToString();
+            //    customerNoDropDownList.SelectedValue = dt.Rows[0]["CustomerNo"].ToString();
+            //    Session["CuSL"] = id;
+            //    //if (customerNoDropDownList.SelectedValue == "Select")
+            //    //{
+            //    //    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please select customer no')", true);
+            //    //    return;
+            //    //}
+
+            //    saveButton.Text = "Update";
+        }
+
+        //if accessing TemplateFields then use FindControl method
+
+    }
+
+}

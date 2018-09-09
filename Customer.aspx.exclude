@@ -1,0 +1,571 @@
+﻿<%@ Register assembly="AjaxControlToolkit" namespace="AjaxControlToolkit" tagprefix="asp" %>
+<%--<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Customer.aspx.cs" Inherits="Customer" %>--%>
+
+
+<%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true"
+    CodeFile="Customer.aspx.cs" Inherits="Customer" %>
+
+ <%--<script src="../../Scripts/jquery-1.3.2.min.js" language="javascript" type="text/javascript"/>
+
+<script src="../../Scripts/jquery-ui-1.7.1.custom.min.js" type="text/javascript"/>
+--%>
+
+
+
+
+ <asp:Content ID="BodyContent" runat="server" ContentPlaceHolderID="MainContent">
+     <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+            <ContentTemplate>
+ 
+     <table>
+ <tr>
+ 
+
+ <th class="style1">
+ <fieldset  style="width: 400px" >
+  <legend>Customer Basic Information 
+  <asp:ToolkitScriptManager ID="ToolkitScriptManager1" runat="server">
+    </asp:ToolkitScriptManager>
+     </legend>
+
+  <table  border="0" style="height: 356px" >
+
+    <tr>
+    <th class="style2">Customer ID</th>
+    <th class="style1"> 
+        <asp:TextBox ID="txtCustomerID" runat="server" 
+           width="200px" Enabled="False" ></asp:TextBox> </th>
+      <th class="style4">
+
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtCustomerID"
+                runat="server" />
+    </th>
+
+    </tr>
+    <tr>
+
+<th class="style3">
+Is Company
+</th>
+
+<th class="style1" align="char" >
+     
+     
+     <asp:CheckBox id="ChISCompany" runat="server"
+Checked="False"  Height="20px" BorderStyle="Groove" AutoPostBack="true" 
+         oncheckedchanged="ChISCompany_CheckedChanged" />
+     
+     </th>
+
+</tr>
+               
+    <tr> 
+    <th class="style2">Name</th>
+    <th class="style1"> <asp:TextBox ID="txtname" runat="server"  width="200px" ></asp:TextBox> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtname"
+                runat="server" />
+    </th>
+    </tr>
+
+
+    <tr> 
+    <th class="style2">Father Name</th>
+    <th class="style1"> <asp:TextBox ID="txtCustomerFaterName" runat="server"  width="200px"></asp:TextBox> </th>
+
+        <th class="style4">
+        <%if (ChISCompany.Checked == false)
+          { %>
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator6" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtCustomerFaterName"
+                runat="server" />
+                <% }%>
+    </th>
+    </tr>
+
+    <tr> 
+    <th class="style2" align="left">Mother Name</th>
+    <th class="style1"> <asp:TextBox ID="txtMotherName" runat="server"  width="200px" ></asp:TextBox> </th>
+
+        <th class="style4">
+          <%if (ChISCompany.Checked == false)
+            { %>
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator7" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtMotherName"
+                runat="server" />
+                <%} %>
+    </th>
+    </tr>
+
+
+
+    <tr>
+    <th class="style2"> Sex </th> 
+    <th class="style1">
+        <%--<script src="../../Scripts/jquery-1.3.2.min.js" language="javascript" type="text/javascript"/>
+
+<script src="../../Scripts/jquery-ui-1.7.1.custom.min.js" type="text/javascript"/>
+--%>
+     
+     <asp:DropDownList ID ="drpSex" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px">
+         <asp:ListItem Value="MALE">MALE</asp:ListItem>
+         <asp:ListItem Value="FEMALE">FEMALE</asp:ListItem>
+        </asp:DropDownList>
+     </th>
+
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator3" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="drpSex"
+           InitialValue="--Select--" runat="server" />
+    </th>
+
+    </tr>
+
+    <tr>
+    <th class="style2"> Marital Status </th> 
+    <th class="style1">
+
+ 
+     <asp:DropDownList ID ="drpMStatus" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px">
+         <asp:ListItem>MARRIED</asp:ListItem>
+         <asp:ListItem>UNMARIED</asp:ListItem>
+        </asp:DropDownList>
+     
+
+     </th>
+      
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator14" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="drpMStatus"
+             InitialValue="--Select--"  runat="server" />
+    </th>
+    </tr>
+
+
+
+    <tr> 
+    <th class="style2">DOB</th>
+    
+
+ 
+
+ <th class="style1"> <asp:TextBox ID="txtDOB" runat="server" width="200px"></asp:TextBox> 
+       
+              
+     </th>
+
+  
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator8" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtDOB"
+                runat="server" />
+    </th>
+    </tr>
+
+
+
+    <tr>
+    <th class="style2"> Religion </th> 
+    <th class="style1">
+
+     <asp:DropDownList ID ="drpReligion" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px">
+         <asp:ListItem>ISLAM</asp:ListItem>
+         <asp:ListItem>HINDUS</asp:ListItem>
+         <asp:ListItem>OTHERS</asp:ListItem>
+        </asp:DropDownList>
+     
+     </th>
+      
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator4" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="drpReligion"
+               InitialValue="--Select--" runat="server" />
+    </th>
+    </tr>
+
+    <tr>
+    <th class="style2"> Nationality </th> 
+    <th class="style1">
+
+     <asp:DropDownList ID ="drpCountyID" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px"></asp:DropDownList>
+     
+     </th>
+      
+      <th class="style4">
+       <asp:RequiredFieldValidator ID="RequiredFieldValidator9" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="drpCountyID"
+               InitialValue="--Select--" runat="server" />
+    </th>
+    </tr>
+
+
+    <tr> 
+    <th class="style2">Mobile </th>
+    <th class="style1"> <asp:TextBox ID="txtMobile" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator13" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtMobile"
+                runat="server" />
+    </th>
+    </tr>
+
+    <tr> 
+    <th class="style2">E-Mail </th>
+    <th class="style1"> <asp:TextBox ID="txtEmail" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator5" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtEmail"
+                runat="server" />
+    </th>
+    </tr>
+
+
+
+
+    <tr> 
+    <th class="style2">NID</th>
+    <th class="style1"> <asp:TextBox ID="txtNID" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator10" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtNID"
+                runat="server" />
+    </th>
+    </tr>
+
+    <tr> 
+    <th class="style2">TIN</th>
+    <th class="style1"> <asp:TextBox ID="txtTIN" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator11" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtTIN"
+                runat="server" />
+    </th>
+    </tr>
+
+    <tr> 
+    <th class="style2">Passport NO </th>
+    <th class="style1"> <asp:TextBox ID="txtPassport" runat="server" width="200px"></asp:TextBox> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator12" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="txtPassport"
+                runat="server" />
+    </th>
+    </tr>
+    <tr> 
+    <th class="style2">Customer NO </th>
+    <th class="style1">  <asp:DropDownList ID ="customerNoDropDownList" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px">
+         <asp:ListItem>Select</asp:ListItem>
+         <asp:ListItem Value="1">Ist </asp:ListItem>
+         <asp:ListItem Value="2">2nd</asp:ListItem>
+         <asp:ListItem Value="3">3rd</asp:ListItem>
+         <asp:ListItem Value="4">4th</asp:ListItem>
+         <asp:ListItem Value="5">5th</asp:ListItem>
+        </asp:DropDownList> </th>
+
+        <th class="style4">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator15" ValidationGroup="G" ErrorMessage="Required" ForeColor="Red" ControlToValidate="customerNoDropDownList"
+             InitialValue="Select"   runat="server" />
+    </th>
+    </tr>
+
+
+    <%--<script src="../../Scripts/jquery-1.3.2.min.js" language="javascript" type="text/javascript"/>
+
+<script src="../../Scripts/jquery-ui-1.7.1.custom.min.js" type="text/javascript"/>
+--%>
+    </table> 
+
+ </fieldset>
+</th>
+
+
+
+
+<th>
+
+<fieldset   style="width: 400px; margin-top:0px">
+  <legend>Customer Contact and Bank Information </legend>
+
+
+<table style="height: 312px">
+
+<tr>
+<th class="style3">Parmanent Adress</th>
+    <th class="style1"> 
+        <asp:TextBox ID="txtPadress" runat="server" 
+           width="200px"  Height="38px" TextMode="MultiLine" ></asp:TextBox> </th>
+      
+
+</tr>
+
+<tr>
+<th class="style3">Parmanent Contact</th>
+    <th class="style1"> <asp:TextBox ID="txtPContact" runat="server" 
+           width="200px" ></asp:TextBox> </th>
+</tr>
+
+<tr>
+<th class="style3">Present Adress</th>
+    <th class="style1"> <asp:TextBox ID="PrAdress" runat="server" 
+           width="200px" Height="38px" TextMode="MultiLine"></asp:TextBox> </th>
+</tr>
+
+<tr>
+<th class="style3">Present Contact</th>
+    <th class="style1"> <asp:TextBox ID="PrContact" runat="server" 
+           width="200px" ></asp:TextBox> </th>
+</tr>
+
+
+
+<tr>
+<th class="style3">Mailing Adress</th>
+    <th class="style1"> <asp:TextBox ID="txtMadress" runat="server" 
+           width="200px" Height="38px" TextMode="MultiLine" ></asp:TextBox> </th>
+
+</tr>
+<tr>
+<th class="style3">Mailing Contact </th>
+    <th class="style1"> <asp:TextBox ID="MContact" runat="server" 
+           width="200px" ></asp:TextBox> </th>
+
+</tr>
+
+<tr>
+<th class="style3">Bank Name</th>
+   <th> <asp:DropDownList ID ="drpBankID" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px" AutoPostBack="true" 
+           onselectedindexchanged="drpBankID_SelectedIndexChanged"></asp:DropDownList>
+            </th>
+
+</tr>
+
+<tr>
+<th class="style3">Branch Name</th>
+  <th>  <asp:DropDownList ID ="drpBankBranch" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px"></asp:DropDownList>
+            </th>
+
+</tr>
+
+
+<tr>
+
+<th class="style3">Account No</th>
+    <th class="style1"> <asp:TextBox ID="txtAcountNO" runat="server" 
+           width="200px" ></asp:TextBox> </th>
+
+</tr>
+
+
+
+<tr>
+
+<th class="style3">
+MB Client ID
+</th>
+
+<th class="style1">
+     
+     
+     <asp:DropDownList ID ="drpMBClientID" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="22px"></asp:DropDownList>
+     </th>
+
+</tr>
+
+
+
+
+
+
+
+
+
+</table>
+
+
+ </fieldset>
+  </th>
+</tr>
+</table>
+<center>
+<table>
+
+ <tr> 
+ <td> <asp:Button  ID ="saveButton" ValidationGroup="G" Text="Save" runat="Server"  Width="100px" onclick="btnSave_Click" > </asp:Button></td>
+    
+     <td><asp:Button  ID ="newButton" Text="New" runat="Server" Width="100px" 
+             onclick="newButton_Click"> </asp:Button></td>
+      </tr>
+     
+     
+
+      
+    
+</table>
+
+<table ><tr><td >
+       
+             <asp:GridView ID="GridView1" runat="server" AllowPaging="true" 
+                    AutoGenerateColumns="false" DataKeyNames="CuSL"
+                    OnPageIndexChanging="GridView1_PageIndexChanging" 
+                  
+                    OnRowDeleting="GridView1_RowDeleting" 
+                 
+                    PageSize="5" 
+                 Width="663px" >
+                    <AlternatingRowStyle BackColor="White" ForeColor="#284775" />
+                    <Columns>
+   
+                        <asp:TemplateField Visible="false">
+                            <EditItemTemplate>
+                                <asp:TextBox ID="idTextBox" runat="server" Text='<%#Eval("CuSL") %>' 
+                                    Visible="false"></asp:TextBox>
+                            </EditItemTemplate>
+                            <ItemTemplate>
+                                <asp:Label ID="idLabel" runat="server" Text='<%#Eval("CuSL") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="CustomerID">
+                           
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerIDLabel" runat="server" Text='<%#Eval("CustomerID") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Name">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerNameLabel" runat="server" 
+                                    Text='<%#Eval("CustomerName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Father Name">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerFatherNameLabel" runat="server" 
+                                    Text='<%#Eval("CustomerFatherName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Mother Name">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerMotherNameLabel" runat="server" 
+                                    Text='<%#Eval("CustomerMotherName") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Sex">
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerSexLabel" runat="server" 
+                                    Text='<%#Eval("CustomerSex") %>'></asp:Label>
+                            </ItemTemplate>
+                      
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Date Of Birth">
+                         
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerDOBLabel" runat="server" 
+                                    Text='<%#Eval("CustomerDOB") %>'></asp:Label>
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField HeaderText="Religion">
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="CustomerReligionLabel" runat="server" 
+                                    Text='<%#Eval("CustomerReligion") %>'></asp:Label>
+                            </ItemTemplate>
+                     
+                        </asp:TemplateField>
+                      <%--   <asp:TemplateField HeaderText="Nationality">
+                            
+                            <ItemTemplate>
+                                <asp:Label ID="CountryNameLabel" runat="server" 
+                                    Text='<%#Eval("CountryName") %>'></asp:Label>
+                            </ItemTemplate>
+                       
+                        </asp:TemplateField>--%>
+                          
+                  <asp:TemplateField>
+        <ItemTemplate>
+                <asp:LinkButton ID="btnEdit" ForeColor="Black" runat="server" Text="Edit" OnClick="btnEdit_Click"/>
+        </ItemTemplate>
+      
+    </asp:TemplateField>
+    <asp:TemplateField>
+       <ItemTemplate>
+                <asp:LinkButton ID="btnPrint" ForeColor="Black" runat="server" Text="Print" OnClick="btnPrint_Click" />
+        </ItemTemplate>
+    </asp:TemplateField>
+                                               
+                   
+                      <asp:CommandField ShowDeleteButton="true" />
+                      
+                    </Columns>
+                    <EditRowStyle BackColor="#999999" />
+                    <FooterStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                    <HeaderStyle BackColor="#5D7B9D" Font-Bold="True" ForeColor="White" />
+                    <PagerStyle BackColor="#284775" ForeColor="White" HorizontalAlign="Center" />
+                    <RowStyle BackColor="#F7F6F3" ForeColor="#333333" />
+                    <SelectedRowStyle BackColor="#E2DED6" Font-Bold="True" ForeColor="#333333" />
+                    <SortedAscendingCellStyle BackColor="#E9E7E2" />
+                    <SortedAscendingHeaderStyle BackColor="#506C8C" />
+                    <SortedDescendingCellStyle BackColor="#FFFDF8" />
+                    <SortedDescendingHeaderStyle BackColor="#6F8DAE" />
+                </asp:GridView>
+          
+             </td></tr>
+            
+             </table>
+             </ContentTemplate>
+        </asp:UpdatePanel>
+ </center>
+
+</asp:Content>
+
+
+<asp:Content ID="Content1" runat="server" contentplaceholderid="HeadContent">
+    <style type="text/css">
+        .style1
+        {
+            width: 375px;
+
+        }
+        .style2
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+
+        }
+        .style3
+        {
+            width: 329px;
+            text-align: left;
+            background-color: #0B5E0A;
+            font-family: Tahoma;
+            color: #FFFAF0;
+            font-size: 10pt;
+            font-weight: 500;
+
+
+        }
+        .style4
+        {
+            width: 46px;
+        }
+    </style>
+</asp:Content>
+

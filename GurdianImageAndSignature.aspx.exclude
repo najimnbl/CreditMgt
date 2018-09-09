@@ -1,0 +1,70 @@
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.master" AutoEventWireup="true" CodeFile="GurdianImageAndSignature.aspx.cs" Inherits="GurdianImageAndSignature" %>
+
+<asp:Content ID="Content1" ContentPlaceHolderID="HeadContent" Runat="Server">
+    <script type = "text/javascript">
+    function Confirm() {
+        var confirm_value = document.createElement("INPUT");
+        confirm_value.type = "hidden";
+        confirm_value.name = "confirm_value";
+        if (confirm("Do you want to Update Image ?")) {
+            confirm_value.value = "Yes";
+        } else {
+            confirm_value.value = "No";
+        }
+        document.forms[0].appendChild(confirm_value);
+    }
+    </script>
+</asp:Content>
+<asp:Content ID="Content2" ContentPlaceHolderID="MainContent" Runat="Server">
+    <center>
+<table width="600px">
+<tr><td style="width:400px"><fieldset style="height:200px">
+<legend>Gurdian Image &amp; Signature Upload</legend>
+<table width="400px">
+            <tr><td style="width:100px; float:left""><label>Guardian ID</label></td><td>
+                <asp:DropDownList ID ="GuardianDropDownList" runat="Server" style="margin-left: 0px" 
+            width="216px" Height="22px" AutoPostBack="true"
+                    onselectedindexchanged="GuardianDropDownList_SelectedIndexChanged"></asp:DropDownList></td></tr>
+             <tr><td style="width:100px; float:left""><label>Nominee ID</label></td><td><asp:DropDownList ID ="NomineeDropDownList" runat="Server" style="margin-left: 0px" 
+            width="216px" Height="22px"></asp:DropDownList></td></tr>
+
+<tr><td style="width:100px; float:left""><label>Select Image</label></td><td><asp:FileUpload  width="216px" ID="FileUpload1" runat="server"  
+            /></td></tr>
+            <tr><td style="width:100px; float:left""><label>Select Signature</label></td><td><asp:FileUpload  width="216px" ID="FileUpload2" runat="server"  
+            /></td></tr>
+<tr><td></td><td><asp:Button ID="btnimguplod" runat="server" Text="Upload"  onclick="upload" />
+
+<asp:Button ID="Button1" runat="server" Height="24px" Visible="false" OnClientClick="Confirm()" onclick="Button1_Click" 
+        Text="Update" Width="54px" />
+</td></tr>
+
+</table></fieldset></td>
+<td><fieldset style="height:200px">
+<legend>Image & Signature</legend>
+<table border="1px" width="200px">
+<tr><asp:GridView ID="Gridview1" AutoGenerateColumns="false" CssClass="Gridview" runat="server" Width="200px"
+HeaderStyle-BackColor="#7779AF" HeaderStyle-ForeColor="white">
+<Columns>
+
+<asp:TemplateField HeaderText="Image">
+<ItemTemplate>
+
+<asp:Image ID="Image1" runat="server" ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("GuardianID")+"&table_name=tblGuardianImage&column_name=GuardianImage&condition= where GuardianID=" %>' Height="100px" Width="100px"/>
+<%--<asp:Image ID="Image1" runat="server" ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("CustomerID") %>' Height="100px" Width="100px"/>--%>
+</ItemTemplate>
+</asp:TemplateField>
+<asp:TemplateField HeaderText="Signature">
+<ItemTemplate>
+
+<asp:Image ID="Image2" runat="server" ImageUrl='<%# "Handler1.ashx?id_Image="+ Eval("GuardianID")+"&table_name=tblGuardianImage&column_name=GuardianSignature&condition= where GuardianID=" %>' Height="100px" Width="100px"/>
+
+</ItemTemplate>
+</asp:TemplateField>
+</Columns>
+</asp:GridView></tr>
+</table>
+</fieldset></td></tr>
+</table>
+ </center>
+</asp:Content>
+

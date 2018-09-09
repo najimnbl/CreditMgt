@@ -1,0 +1,87 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+
+public partial class test : System.Web.UI.Page
+{
+    List<MenuEntity> oMenuList = new List<MenuEntity>();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+
+    }
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        Menu NavigationMenu = (Menu)this.Master.FindControl("NavigationMenu");
+        int count = NavigationMenu.Items.Count;
+        //List<MenuEntity> oMenuList = new List<MenuEntity>();
+        MenuEntity oMenu = new MenuEntity();
+        //foreach (MenuItem menu in NavigationMenu.Items)
+        //{ 
+        
+           
+        //}
+        //foreach (MenuItem item in NavigationMenu.Items)
+        //{
+
+        //    // Display the menu items.
+        //    oMenu = new MenuEntity();
+          
+
+        //}
+        
+        //for (int i = 0; i < count; i++)
+        //{
+        //    oMenu = new MenuEntity();
+        //    oMenu.MenuNo = (i + 1).ToString();
+        //    oMenu.MenuName = NavigationMenu.Items[i].Text;
+        //    oMenuList.Add(oMenu);
+        //}
+        //GridView1.DataSource = oMenuList;
+        //GridView1.DataBind();
+        if (NavigationMenu.Items.Count > 0)
+        {
+
+            // Iterate through the root menu items in the Items collection.
+            foreach (MenuItem item in NavigationMenu.Items)
+            {
+
+                // Display the menu items.
+                DisplayChildMenuText(item);
+
+            }
+            GridView1.DataSource = oMenuList;
+            GridView1.DataBind();
+
+        }
+        else
+        {
+
+            Label2.Text = "The Menu control does not have any items.";
+
+        }
+    }
+    void DisplayChildMenuText(MenuItem item)
+    {
+
+        // Display the menu item's text value.
+        Label2.Text += item.Text + "<br />";
+        MenuEntity oMenu = new MenuEntity();
+        oMenu.MenuName = item.Text;
+        //    oMenu.MenuName = NavigationMenu.Items[i].Text;
+        oMenuList.Add(oMenu);
+        // Iterate through the child menu items of the parent menu item 
+        // passed into this method, and display their values.
+        foreach (MenuItem childItem in item.ChildItems)
+        {
+
+            // Recursively call the DisplayChildMenuText method to
+            // traverse the tree and display all child menu items.
+            DisplayChildMenuText(childItem);
+
+        }
+
+    }
+}

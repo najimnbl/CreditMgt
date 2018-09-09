@@ -1,0 +1,214 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data.SqlClient;
+using System.Data;
+
+public partial class ReportsGL : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            //LoadBranch(1, "");
+        }
+
+    }
+    //public void LoadBranch(int a, string code)
+    //{
+    //    DataSet ds = new DataSet();
+    //    SqlConnection conn = dbconnection.connection();
+    //    //string quiry = "select code from program where Code <>'" + code + "'  order by code";
+
+    //    string quiry = "select BranchName,BrCode  from BranchInfo  order by  BranchName";
+
+
+
+    //    SqlDataAdapter dt = new SqlDataAdapter(quiry, conn);
+    //    dt.Fill(ds);
+    //    drpBranch.DataSource = ds;
+    //    drpBranch.DataTextField = "BranchName";
+    //    drpBranch.DataValueField = "BrCode";
+    //    drpBranch.DataBind();
+
+    //    if (a == 1)
+    //    {
+    //        drpBranch.Items.Insert(0, "--Select--");
+    //    }
+
+    //}
+
+    //protected void GLSummary_Click(object sender, EventArgs e)
+    //{
+
+    //    if (Session["user"].ToString() != drpBranch.SelectedValue)
+    //    {
+    //        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+
+    //        return;
+    //    }
+
+        
+        
+        
+        
+        
+    //    if (validation() == 1)
+    //        return;
+
+    //    SqlConnection conn = dbconnection.connection();
+    //    SqlCommand objcmd = new SqlCommand("update GLSummary Set   brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+    //    objcmd.ExecuteNonQuery();
+    //    conn.Close();
+
+    //    Session["rpttype"] = "SummaryReportGL";
+
+    //    ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RPTGLSummary.rpt"));
+
+      
+
+    //}
+    //protected void GLConfigrpt_Click(object sender, EventArgs e)
+    //{
+
+    //    if (Session["user"].ToString() != drpBranch.SelectedValue)
+    //    {
+    //        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+
+    //        return;
+    //    }
+
+
+
+        
+    //    if (validation() == 1)
+    //        return;
+
+
+    //    SqlConnection conn = dbconnection.connection();
+    //    SqlCommand objcmd = new SqlCommand("update GLBalanceConfigaretion Set   brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+    //    objcmd.ExecuteNonQuery();
+    //    conn.Close();
+
+    //    //int check = 1;
+    //    //Session["Chek"] = check;
+
+    //    if (Iszero.Checked == false)
+    //    {
+
+    //        Session["rpttype"] = "GLConfigReport";
+    //        ReportControl1.GLDisplayReportCon(Server.MapPath("~/Reports/RPTGLConfiguretion.rpt"));
+
+    //    }
+
+    //    else
+    //    {
+
+    //        Session["rpttype"] = "GLConfigReportZ";
+
+    //        ReportControl1.GLDisplayReportCon(Server.MapPath("~/Reports/RPTGLConfiguretionnonWZero.rpt"));
+
+
+
+
+    //    }
+
+
+    //}
+    //public int validation()
+    //{
+    //    int i = 0;
+    //    if (drpBranch.Text == "--Select--")
+    //    {
+    //        string message = "Please Select Valid Branch. ";
+    //        ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + message + "');", true);
+
+
+    //        i = 1;
+
+    //    }
+
+    //    return i;
+    //}
+
+
+
+
+    protected void GlConfigureDetais_Click(object sender, EventArgs e)
+    {
+        //if (Session["user"].ToString() != drpBranch.SelectedValue)
+        //{
+        //    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Please Select Valid Branch')", true);
+
+        //    return;
+        //}
+
+        //if (validation() == 1)
+        //    return;
+
+        //SqlConnection conn = dbconnection.connection();
+        //SqlCommand objcmd = new SqlCommand("update GLBalanceConfigaretion Set   brCode = '" + drpBranch.SelectedValue + "'", conn);
+
+        //objcmd.ExecuteNonQuery();
+        //conn.Close();
+
+        Session["rpttype"] = "GLMatch";
+
+        ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMatchingGL.rpt"));
+       
+        //ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RPTConsolidaedGLReconciliation.rpt"));
+        
+        
+        //Response.Redirect("ReportViewer.aspx");
+
+
+    }
+
+
+    protected void btnGLReconsilation_Click(object sender, EventArgs e)
+    {
+
+        //if (Session["user"].ToString() != "Admin")
+        //{
+        //    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('You Are Not Authorised')", true);
+
+        //    return;
+        //}
+
+        //else
+        //{
+
+        Session["rpttype"] = "RPTReconsilationMitchMatchGL";
+
+        ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMitchMatchGL.rpt"));
+
+        //}
+
+    }
+
+
+
+    protected void Button1_Click(object sender, EventArgs e)
+    {
+        Session["rpttype"] = "RPTReconsilationMatchingPL";
+
+        ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMatchingPL.rpt"));
+    }
+    protected void Button2_Click(object sender, EventArgs e)
+    {
+        Session["rpttype"] = "RPTReconsilationMitchMatchPL";
+
+        ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RPTReconsilationMitchMatchPL.rpt"));
+    }
+    protected void Recon_Click(object sender, EventArgs e)
+    {
+        Session["rpttype"] = "RptLDReconFinal";
+
+        ReportControl1.DisplayReportGL(Server.MapPath("./Reports/RptLDReconFinal.rpt"));
+    }
+}

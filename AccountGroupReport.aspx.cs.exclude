@@ -1,0 +1,187 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+
+
+public partial class AccountGroupReport : System.Web.UI.Page
+{
+
+    AccountGroupReportDAO oAccountGroupReportDAO = new AccountGroupReportDAO();
+    AccountGroupReportEntity oAccountGroupReportEntity = new AccountGroupReportEntity();
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            //LoadDropDownList();
+            gridViewBind();
+
+
+        }
+
+    }
+
+    protected void btnBSave_Click1(object sender, EventArgs e)
+    {
+
+        oAccountGroupReportEntity = new AccountGroupReportEntity();
+
+        
+
+        oAccountGroupReportEntity.AccGrpCodeR = txtAccGrpCodeR.Text;
+        oAccountGroupReportEntity.AccGrpNameR =txtAccGrpNameR .Text;
+
+
+        string condition = " where AccGrpCodeR='" + oAccountGroupReportEntity.AccGrpCodeR + "'";
+        DataTable dt = oAccountGroupReportDAO.GetAccountGroupReport(condition);
+        string message = "";
+        if (dt.Rows.Count == 0)
+        {
+            int i = oAccountGroupReportDAO.InsertAccountGroupReport(oAccountGroupReportEntity);
+            if (i == 1)
+            {
+                message = "Data Inserted Successfully";
+                Clear();
+            }
+            else
+                message = "Data Not  Inserted";
+
+        }
+        else
+        {
+            message = "Data Alreay in DataBase";
+        }
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        gridViewBind();
+    }
+
+    public void Clear()
+    {
+
+        txtAccGrpCodeR.Text = "";
+        txtAccGrpNameR.Text = "";
+       
+    }
+ 
+
+    private void gridViewBind()
+    {
+
+        AccountGroupReportDAO oAccountGroupReportDAO = new AccountGroupReportDAO();
+
+        string condition = " order by AccGrpCodeR ASC";
+        DataTable dt = oAccountGroupReportDAO.GetAccountGroupReportView(condition);
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+
+        GridView1.PageIndex = e.NewPageIndex;
+        gridViewBind();
+
+    }
+
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        gridViewBind();
+
+
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+
+       
+
+      
+        TextBox txtGGrAccGrpCodeR = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GrAccGrpCodeR");
+        TextBox txtGAccGrpNameR = (TextBox)GridView1.Rows[e.RowIndex].FindControl("GrAccGrpNameR");
+       
+        AccountGroupReportEntity oAccountGroupReportEntity = new AccountGroupReportEntity();
+
+        oAccountGroupReportEntity.AccGrpCodeR = txtGGrAccGrpCodeR.Text;
+        oAccountGroupReportEntity.AccGrpNameR = txtGAccGrpNameR.Text;
+
+
+
+
+        oAccountGroupReportEntity.AccGrpSLR = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+        int i = oAccountGroupReportDAO.UpdateAccountGroupReport(oAccountGroupReportEntity);
+        string message = "";
+        GridView1.EditIndex = -1;
+
+
+        if (i == 1)
+            message = "Data Updated Successfully";
+        else
+            message = "Data Not Updated!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+
+
+
+
+
+        oAccountGroupReportEntity.AccGrpSLR = Convert.ToInt32(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        int i = oAccountGroupReportDAO.DeleteAccountGroupReport(oAccountGroupReportEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+            message = "Data Deleted Successfully";
+        else
+            message = "Data Not Deleted!";
+
+        gridViewBind();
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+
+        GridView1.EditIndex = e.NewEditIndex;
+        gridViewBind();
+
+        // gvbind();
+
+    }
+
+
+
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowType == DataControlRowType.DataRow)
+        {
+           
+
+
+
+
+        }
+
+
+
+
+    }
+    protected void txtNew_Click1(object sender, EventArgs e)
+    {
+        Clear();
+    }
+
+}

@@ -1,0 +1,74 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using System.Data;
+using System.Data.SqlClient;
+using System.Configuration;
+public partial class SimpleReport : System.Web.UI.Page
+{
+    //protected void Page_Load(object sender, EventArgs e)
+    //{
+
+
+
+
+
+
+
+
+
+
+
+    //ReportDocument rptDoc = new ReportDocument();
+    ////ParameterFields paraFileds = new ParameterFields();
+    ////rptDoc.SetDatabaseLogon("bpe", "#21bpe@67!", "BPC", "BusinessPLUSEng");
+    //rptDoc.Load(Server.MapPath("./Reports/rptBatchProgramWiseStudentAdmission.rpt"));
+    
+    //rptDoc.SetParameterValue(0, Session["Program"]);
+    //rptDoc.SetParameterValue(1, Session["Batch"]);
+    //CrystalReportViewer1.ReportSource = rptDoc;
+    //}
+
+
+    // ReportDocument document = new ReportDocument();
+    // public void DisplayReport(string reportPath, List<KeyValuePair<string, object>> parameters)
+    // {
+
+    //     document.Load(reportPath);
+    //     Session.Add("CrStaffrecruit", document);
+    //     Tables reportTables = document.Database.Tables;
+    //     ConnectionInfo connectionInfo = new ConnectionInfo();
+    //     string serName = ConfigurationManager.ConnectionStrings["Connrpt"].ConnectionString;
+    //     connectionInfo.ServerName = serName;
+    //     connectionInfo.DatabaseName = "CRUD";
+    //     connectionInfo.UserID = "ums";
+    //     connectionInfo.Password = "ums";
+    //     //connectionInfo.Type = ConnectionInfoType.SQL;
+    //     //document.SetDatabaseLogon("bpe", "#21bpe@67!", "BPC", "BusinessPLUSEng");
+
+    //     foreach (CrystalDecisions.CrystalReports.Engine.Table tbl in reportTables)
+    //     {
+    //         TableLogOnInfo logonInfo = tbl.LogOnInfo;
+    //         logonInfo.ConnectionInfo = connectionInfo;
+    //         tbl.ApplyLogOnInfo(logonInfo);
+    //     }
+    //     //document.SetDatabaseLogon("bpe", "#21bpe@67!", "BPC", "BusinessPLUSEng");
+
+    //     if (parameters != null)
+    //     {
+    //         foreach (KeyValuePair<string, object> parameter in parameters)
+    //         {
+    //             ////Add parameters
+    //             document.SetParameterValue(parameter.Key, parameter.Value);
+    //         }
+    //     }
+    //     CrystalReportViewer1.EnableDatabaseLogonPrompt = false;
+    //     CrystalReportViewer1.ReportSource = document;
+    // }
+}
+

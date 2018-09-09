@@ -1,0 +1,279 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+
+public partial class ChartOfAccount : System.Web.UI.Page
+{
+    SubGroupAccountEntity oSubGroupAccountEntity = new SubGroupAccountEntity();
+    SubGroupAccountDAO oSubGroupAccountDAO = new SubGroupAccountDAO();
+    ChartOfAccountDAO oChartOfAccountDAO = new ChartOfAccountDAO();
+    ChartOfAccountEntity oChartOfAccountEntity = new ChartOfAccountEntity();
+    ReturnVal oRtnValue = new ReturnVal();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+
+            //string GuardianID = oRtnValue.ReturnValue("tblGuardian", "", "", "isnull(MAX(GuardianID),0000000)+1");
+            //int value;
+            //int.TryParse(GuardianID, out value);
+            //txtGuardianID.Text = value.ToString("D7");
+
+            LoadDropDownList();
+            string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+            gridViewBind(condition);
+            txtGrpAccNo.Text = oChartOfAccountDAO.CreateCOACode(int.Parse(drpGoupAccountName.SelectedValue));
+
+        }
+    }
+
+    private void gridViewBind(string condition)
+    {
+        
+        condition = condition+" order by CoAccSL desc";
+        DataTable dt =oChartOfAccountDAO.GetChartOfAccount(condition);
+
+        GridView1.DataSource = dt;
+        GridView1.DataBind();
+
+    }
+    protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
+    {
+        if (e.Row.RowState == DataControlRowState.Edit)
+        {
+            e.Row.Cells[0].Controls[0].Visible = false;
+        }
+    }
+    protected void GridView1_RowUpdated(object sender, GridViewUpdatedEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+    }
+    protected void GridView1_RowUpdating(object sender, GridViewUpdateEventArgs e)
+    {
+        GridView1.EditIndex = -1;
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+    }
+
+    protected void GridView1_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    protected void GridView1_RowEditing(object sender, GridViewEditEventArgs e)
+    {
+        //GridView1.EditIndex = -1;
+        GridView1.EditIndex = e.NewEditIndex;
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+    }
+    protected void GridView1_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+        oChartOfAccountEntity.CoAccSL=Convert.ToInt16(GridView1.DataKeys[e.RowIndex].Value.ToString());
+
+        int i = oChartOfAccountDAO.DeleteChartOfAccount(oChartOfAccountEntity);
+
+        GridView1.EditIndex = -1;
+
+
+        string message = "";
+        if (i == 1)
+        {
+            message = "Data Deleted Successfully";
+        }
+        else
+            message = "Data Not Deleted!";
+
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+
+    }
+    protected void GridView1_PageIndexChanging(object sender, GridViewPageEventArgs e)
+    {
+        GridView1.PageIndex = e.NewPageIndex;
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+    }
+    protected void GridView1_RowCancelingEdit(object sender, GridViewCancelEditEventArgs e)
+    {
+
+        GridView1.EditIndex = -1;
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+
+
+    }
+
+    private void LoadDropDownList()
+    {
+        DataTable dt = oSubGroupAccountDAO.GetGrpAccSL("");
+        if (dt.Rows.Count > 0)
+        {
+            drpGoupAccountName.DataSource = dt;
+            //drpGoupAccountName.DataTextField = "";
+            //drpGoupAccountName.DataValueField = "GrpAccName";
+            drpGoupAccountName.DataTextField = "GrpAccName";
+            drpGoupAccountName.DataValueField = "GrpAccSL";
+            drpGoupAccountName.DataBind();
+        }
+        loadSubAccountGroupDropDownList();
+
+    }
+    private void loadSubAccountGroupDropDownList()
+    {
+        if (drpGoupAccountName.Items.Count > 0)
+        {
+            string condion = " where GrpAccSL='" + drpGoupAccountName.SelectedValue + "'";
+            DataTable dt = oSubGroupAccountDAO.GetSubGroupAccount(condion);
+            subGroupAccDropDownList.DataSource = dt;
+            subGroupAccDropDownList.DataTextField = "SGrpAccName";
+            subGroupAccDropDownList.DataValueField = "SGrpAccSL";
+            subGroupAccDropDownList.DataBind();
+            
+        }
+    }
+    protected void saveButton_Click(object sender, EventArgs e)
+    {
+        if (drpGoupAccountName.SelectedValue == "" || drpGoupAccountName.SelectedValue == null)
+            return;
+
+        oChartOfAccountDAO = new ChartOfAccountDAO();
+        oChartOfAccountEntity = new ChartOfAccountEntity();
+        oChartOfAccountEntity.CoAccNo = txtGrpAccNo.Text;
+        oChartOfAccountEntity.CoAccName = txtAccName.Text;
+        oChartOfAccountEntity.OpenDayBalance =Convert.ToDecimal(txtBalance.Text);
+        oChartOfAccountEntity.SGrpAccSL =int.Parse(subGroupAccDropDownList.SelectedValue);
+        oChartOfAccountEntity.GrpAccSL = int.Parse(drpGoupAccountName.SelectedValue);
+        oChartOfAccountEntity.ClossingBalance = 0;
+        oChartOfAccountEntity.AvailableBalance = 0;
+        oChartOfAccountEntity.CurrentBalance=0;
+        oChartOfAccountEntity.AccGrpSLR = int.Parse(reportTypeDropDownList.SelectedValue);
+        oChartOfAccountEntity.AccTypeSL = int.Parse(accTypeDropDownList.SelectedValue);
+        oChartOfAccountEntity.OpenDate = DateTime.Now;
+        oChartOfAccountEntity.Posted = false;
+        oChartOfAccountEntity.LastModifiedBy = DateTime.Now.ToShortDateString();
+        oChartOfAccountEntity.CreateBy = DateTime.Now.ToShortDateString();
+        
+        string message = "";
+        if (saveButton.Text == "Update")
+        {
+            if (Session["CoAccSL"] != null)
+            {
+                oChartOfAccountEntity.CoAccSL =Convert.ToInt16(Session["CoAccSL"]);
+                DataTable dt = (DataTable)Session["dt"];
+                oChartOfAccountEntity.ClossingBalance = Convert.ToDecimal(dt.Rows[0]["ClossingBalance"].ToString());
+                oChartOfAccountEntity.AvailableBalance = Convert.ToDecimal(dt.Rows[0]["AvailableBalance"].ToString());
+                oChartOfAccountEntity.CurrentBalance = Convert.ToDecimal(dt.Rows[0]["CurrentBalance"].ToString());
+                oChartOfAccountEntity.Posted =Convert.ToBoolean(dt.Rows[0]["Posted"]);
+                int i = oChartOfAccountDAO.UpdateChartOfAccount(oChartOfAccountEntity);
+
+                if (i == 1)
+                {
+                    message = "Chart Of Account Updated Successfully";
+
+                    Clear();
+                }
+                else
+                    message = "Chart Of Account Not Updated!";
+            }
+        }
+        else
+        {
+            int i = oChartOfAccountDAO.InsertChartOfAccount(oChartOfAccountEntity);
+
+            if (i == 1)
+            {
+                message = "Chart Of Account Inserted Successfully";
+
+                Clear();
+                txtGrpAccNo.Text = oChartOfAccountDAO.CreateCOACode(int.Parse(drpGoupAccountName.SelectedValue));
+            }
+            else
+                message = "Chart Of Account Not Inserted!";
+        }
+
+
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+        //gridViewBind("");
+        ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+       
+    }
+
+    private void Clear()
+    {
+        txtAccName.Text = "";
+        txtGrpAccNo.Text = "";
+        txtBalance.Text = "0";
+       
+        saveButton.Text = "Save";
+
+    }
+    protected void newButton_Click(object sender, EventArgs e)
+    {
+        Clear();
+        txtGrpAccNo.Text = oChartOfAccountDAO.CreateCOACode(int.Parse(drpGoupAccountName.SelectedValue));
+    }
+    protected void btnEdit_Click(object sender, EventArgs e)
+    {
+
+        LinkButton b = (LinkButton)sender;
+        GridViewRow row = (GridViewRow)b.NamingContainer;
+        if (row != null)
+        {
+            int index = row.RowIndex; //gets the row index selected
+            int id = Convert.ToInt32(GridView1.DataKeys[index].Value.ToString());
+            //grab the values here
+            //string myVariable = row.Cells[1].Text;
+            string condition = " where CoAccSL='" + id + "'";
+            //DataTable dt = oCustomerDAO.GetCustomer(condition);
+            DataTable dt =oChartOfAccountDAO.GetChartOfAccount(condition);
+
+            if (dt.Rows.Count > 0)
+            {
+
+                txtGrpAccNo.Text = dt.Rows[0]["CoAccNo"].ToString();
+                txtAccName.Text = dt.Rows[0]["CoAccName"].ToString();
+                drpGoupAccountName.SelectedValue = dt.Rows[0]["GrpAccSL"].ToString();
+                loadSubAccountGroupDropDownList();
+                subGroupAccDropDownList.SelectedValue = dt.Rows[0]["SGrpAccSL"].ToString();
+                accTypeDropDownList.SelectedValue = dt.Rows[0]["AccTypeSL"].ToString();
+                reportTypeDropDownList.SelectedValue = dt.Rows[0]["AccGrpSLR"].ToString();
+                txtBalance.Text = dt.Rows[0]["OpenDayBalance"].ToString();
+                Session["dt"] = dt;
+                Session["CoAccSL"] = id;
+
+                saveButton.Text = "Update";
+            }
+
+
+        }
+    }
+    protected void seachButton_Click(object sender, EventArgs e)
+    {
+        string condition = " where CoAccNo like '%"+txtGrpAccNo.Text+"%'";
+        gridViewBind(condition);
+    }
+    protected void txtGrpAccNo_TextChanged(object sender, EventArgs e)
+    {
+        seachButton_Click(sender, e);
+    }
+    protected void drpGoupAccountName_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        loadSubAccountGroupDropDownList();
+        subGroupAccDropDownList_SelectedIndexChanged(sender, e);
+    }
+    protected void subGroupAccDropDownList_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        string condition = " where tblChartOfAccount.SGrpAccSL='" + subGroupAccDropDownList.SelectedValue + "'";
+        gridViewBind(condition);
+        txtGrpAccNo.Text = oChartOfAccountDAO.CreateCOACode(int.Parse(drpGoupAccountName.SelectedValue));
+    }
+}

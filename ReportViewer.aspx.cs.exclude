@@ -1,0 +1,65 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using CrystalDecisions.CrystalReports.Engine;
+using CrystalDecisions.Shared;
+using System.IO;
+
+
+    public partial class ReportViewer : System.Web.UI.Page
+    {
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            if (Session["ds"] != null)
+            {
+               
+                ReportDocument myReportDocument = new ReportDocument();
+              
+
+             
+                DataSet ds = (DataSet)Session["ds"];
+                DataSet ds1 =new DataSet();
+             
+                string fileName = "";
+                if (Session["ReportName"].ToString() == "DESCO - Bill Collection Statement (Summarized)")
+                {
+                    myReportDocument.Load(Server.MapPath("SummeryCrystalReport.rpt"));
+                    fileName = "SummeryReport.pdf";
+                }
+                else if (Session["ReportName"].ToString() == "DESCO - Bill Collection Statement (Details)")
+                {
+                    myReportDocument.Load(Server.MapPath("DetailsCrystalReport.rpt"));
+                    fileName = "DetailsReport.pdf";
+                }
+                else if (Session["ReportName"].ToString() == "DESCO - Bill Collection Statement (Day Wise)") 
+                {
+                    myReportDocument.Load(Server.MapPath("DailyWiseCrystalReport.rpt"));
+                    fileName = "DailyWiseReport.pdf";
+                }
+             
+                myReportDocument.SetDataSource(ds);
+          
+
+
+                myReportDocument.SetParameterValue("ReportName", Session["ReportName"].ToString());
+                myReportDocument.SetParameterValue("DateFrom", Session["fromDate"].ToString());
+                myReportDocument.SetParameterValue("DateTo", Session["toDate"].ToString());
+                myReportDocument.SetParameterValue("brName", Session["brName"].ToString());
+                //myReportDocument.SetParameterValue("ReportType", Session["ReportType"].ToString());
+           
+                MemoryStream oStream = (MemoryStream)myReportDocument.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+
+                Response.Clear();
+                Response.Buffer = true;
+                Response.ContentType = "application/pdf";
+                Response.AddHeader("Content-Disposition", "attachment; filename="+fileName+"");
+                Response.BinaryWrite(oStream.ToArray());
+                Response.End();
+            }
+
+        }
+    }

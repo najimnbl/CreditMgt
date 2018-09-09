@@ -1,0 +1,5 @@
+F:\FRD\File Upload\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\bin\ASPNetFileUpDownLoad.dll
+F:\FRD\File Upload\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\bin\ASPNetFileUpDownLoad.pdb
+F:\FRD\File Upload\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\obj\Debug\ResolveAssemblyReference.cache
+F:\FRD\File Upload\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\obj\Debug\ASPNetFileUpDownLoad.dll
+F:\FRD\File Upload\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\ASPNetFileUpDownLoad\obj\Debug\ASPNetFileUpDownLoad.pdb

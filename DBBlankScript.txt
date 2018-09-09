@@ -1,0 +1,10 @@
+Select * from dbo.LoanAplicationHistory;
+Select * from dbo.LoanDocumentChecklist
+Select * from dbo.LoanAplicationComments
+Select * from dbo.LoanAplication
+
+
+Delete from dbo.LoanAplicationHistory;
+Delete from dbo.LoanDocumentChecklist
+Delete from dbo.LoanAplicationComments
+Delete from dbo.LoanAplication

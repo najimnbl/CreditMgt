@@ -1,0 +1,192 @@
+﻿ <%@ Page Title="Home Page" Language="C#" MasterPageFile="~/Site.master"  AutoEventWireup="true"
+    CodeFile="ReportsGL.aspx.cs" Inherits="ReportsGL" %>
+
+  
+
+
+
+
+<%@ Register assembly="CrystalDecisions.Web, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304" namespace="CrystalDecisions.Web" tagprefix="CR" %>
+<%@ Register src="RpControl.ascx" tagname="RpControl" tagprefix="uc1" %>
+<%@ Register src="RpControl.ascx" tagname="RpControl" tagprefix="uc2" %>
+
+
+
+<script runat="server">
+
+  
+</script>
+<%--<script src="../../Scripts/jquery-1.3.2.min.js" language="javascript" type="text/javascript"/>
+
+<script src="../../Scripts/jquery-ui-1.7.1.custom.min.js" type="text/javascript"/>
+--%>
+
+
+
+
+ <asp:Content ID="BodyContent" runat="server" ContentPlaceHolderID="MainContent">
+  
+     <center>
+     <table style="height: 75px; width: 476px;" style="width: 500px">
+ <tr>
+ <th class="style6">
+ <fieldset  style="width: 450px" >
+  <legend>GL Reports </legend>
+
+  <table  border="0" style="width: 446px" >
+
+  
+
+               
+<%--    <tr> 
+    <th class="style2">Branch</th>
+   <th class="style1"> 
+    
+    <asp:DropDownList ID ="drpBranch" runat="Server" style="margin-left: 0px" 
+            width="205px" Height="21px"></asp:DropDownList>
+
+            </th>
+
+    <th class="style5">
+
+            <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="Required" ForeColor="Red" ControlToValidate="drpBranch"
+                runat="server" />
+    </th>
+    </tr>
+
+
+ 
+ <tr>
+ 
+ <th class="style5">
+     &nbsp;</th>
+
+
+ <th>
+ <asp:Button  ID ="GLSummary" Text="GL Summary" runat="Server" Width="100px" onclick="GLSummary_Click"  
+          > </asp:Button>
+
+ 
+ 
+ <asp:Button  ID ="GLConfigrpt" Text="GL Details" runat="Server" Width="100px" onclick="GLConfigrpt_Click"  
+          > </asp:Button>
+   
+ </th>
+ 
+ <th class="style4">
+ 
+    <asp:CheckBox id="Iszero" runat="server" Text ="Without Zero Balance"
+    Checked="TRUE" />
+ 
+ </th>
+
+
+   
+ 
+ </tr>--%>
+
+
+
+    </table> 
+
+
+
+    <fieldset  style="width: 400px" >
+  <legend>T24 And A2Z GL Information </legend>
+  <center>
+  <table  border="0" style="width: 40px" >
+
+     
+
+      
+
+     
+
+   <asp:Button  ID ="GlConfigureDetais" Text="Matching GL" runat="Server" 
+          Width="100px" onclick="GlConfigureDetais_Click"   
+          > </asp:Button>
+
+         <asp:Button  ID ="btnGLReconsilation" Text="Mitch Match GL" runat="Server" 
+          Width="133px" onclick="btnGLReconsilation_Click"   
+          > </asp:Button>
+
+ 
+ 
+ 
+
+  </table>
+  </center>
+  </fieldset>
+
+   <fieldset  style="width: 400px" >
+  <legend>T24 And A2Z PL Information </legend>
+  <center>
+  <table  border="0" style="width: 40px" >
+
+     
+
+      
+
+     
+
+   <asp:Button  ID ="Button1" Text="Matching PL" runat="Server" 
+          Width="100px" onclick="Button1_Click"    
+          > </asp:Button>
+
+         <asp:Button  ID ="Button2" Text="Mitch Match PL" runat="Server" 
+          Width="133px"  onclick="Button2_Click"
+          > </asp:Button>
+
+ 
+ 
+ 
+
+  </table>
+  </center>
+  </fieldset>
+  <fieldset  style="width: 400px" >
+  <legend>T24 And A2Z LD Recon. Information </legend>
+  <center>
+  <table  border="0" >
+
+     
+
+      
+
+     
+
+   <asp:Button  ID ="Recon" Text="LD Recon." runat="Server" 
+          Width="100px" onclick="Recon_Click"    
+          > </asp:Button>
+
+         <%--<asp:Button  ID ="Button4" Text="Mitch Match PL" runat="Server" 
+          Width="133px"  onclick="Button2_Click"
+          > </asp:Button>--%>
+
+ 
+ 
+ 
+
+  </table>
+  </center>
+  </fieldset>
+
+   </fieldset>
+</th>
+
+</tr>
+</table>
+</center>
+    <uc2:RpControl ID="ReportControl1" runat="server" Visible="True" />
+  </asp:Content>
+
+
+<asp:Content ID="Content1" runat="server" contentplaceholderid="HeadContent">
+    <style type="text/css">
+        .style6
+        {
+            width: 394px;
+        }
+    </style>
+</asp:Content>
+

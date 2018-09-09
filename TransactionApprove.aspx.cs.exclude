@@ -1,0 +1,232 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Data;
+using System.Data.SqlClient;
+using System.Globalization;
+
+public partial class TransactionApprove : System.Web.UI.Page
+{
+    TransactionAccountDAO oTransactionAccountDAO = new TransactionAccountDAO();
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            
+            loadGridView2();
+            DateTextBox.Text = DateTime.Now.ToString("dd/MM/yyyy");
+
+        }
+    }
+
+    private void loadGridView2()
+    {
+        DataTable dt = oTransactionAccountDAO.GetUnApprovedVoucher();
+        GridView2.DataSource = dt;
+        GridView2.DataBind();
+    }
+
+    protected void insertButton_Click(object sender, EventArgs e)
+    {
+
+    }
+    protected void VoucherNoLinkButton_Click(object sender, EventArgs e)
+    {
+        //string voucherNo = GridView2.SelectedRow.Value.ToString();
+    }
+    protected void GridView2_RowCommand(object sender, GridViewCommandEventArgs e)
+    {
+        if (e.CommandName == "select")
+        {
+
+            string voucherNo = e.CommandArgument.ToString();
+            string condition = " where tblTransaction.VoucherNo='" + voucherNo + "'";
+            DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+
+            particularLabel.Text ="Particulars: "+ dt.Rows[0]["PartiCulars"].ToString();
+            GridView1.DataSource = dt;
+            GridView1.DataBind();
+
+            
+            
+        }
+       
+    }
+    protected void approveButton_Click(object sender, EventArgs e)
+    {
+        ChartOfAccountDAO oChartOfAccountDAO=new ChartOfAccountDAO();
+        ClientDAO oClientDAO = new ClientDAO();
+        for (int i = 0; i < GridView2.Rows.Count; i++)
+        {
+            if (((CheckBox)GridView2.Rows[i].FindControl("selectCheckBox")).Checked)
+            {
+                string voucherNo = ((LinkButton)GridView2.Rows[i].FindControl("VoucherNoLinkButton")).Text;
+                string condition = " where tblTransaction.VoucherNo='" + voucherNo + "'";
+                DataTable dt = oTransactionAccountDAO.GetVoucherDetails(condition);
+                ConnectionDatabase oConnectionDatabase = new ConnectionDatabase();
+                SqlConnection con = oConnectionDatabase.DatabaseConnection();
+                SqlTransaction oSqlTransaction;
+                oSqlTransaction = con.BeginTransaction("s");
+                int r = 0; int m = 0;
+                string message = "";
+                for (int k = 0; k < dt.Rows.Count; k++)
+                {
+                    if (Convert.ToBoolean(dt.Rows[k]["Matured"]) == false)
+                    {
+
+                        DateTime today = DateTime.ParseExact(DateTextBox.Text, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                        DateTime chequeDate =Convert.ToDateTime(dt.Rows[k]["ChequeDate"]);
+                        if (today == chequeDate)
+                        {
+                            int p = oTransactionAccountDAO.UpdateTransactionAccChequeMatured(true, voucherNo);
+                        }
+                        else
+                        {
+                            ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('Cheque is not Matured')", true);
+                            return;
+                        }
+                    }
+                }
+
+
+                    for (int k = 0; k < dt.Rows.Count; k++)
+                    {
+                        decimal amount = 0;
+                        string accountNo = dt.Rows[k]["CoAccNo"].ToString();
+                        if (Convert.ToBoolean(dt.Rows[k]["IsClient"]) == true)
+                        {
+                            
+                            if (Convert.ToDecimal(dt.Rows[k]["Debit"]) != 0)
+                            {
+                                amount =-Convert.ToDecimal(dt.Rows[k]["Debit"]);
+                            }
+                            if (Convert.ToDecimal(dt.Rows[k]["Credit"]) != 0)
+                            {
+                                amount =Convert.ToDecimal(dt.Rows[k]["Credit"]);
+                            }
+                            string condition2 = " where ClientID='"+accountNo+"'";
+                            DataTable clientDataTable= oClientDAO.GetClient(condition2);
+                            if (Convert.ToDecimal(clientDataTable.Rows[0]["clientBal"])+amount< 0)
+                            {
+                                message = accountNo + ", Not Available Balance!";
+                                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+                                return;
+                            }
+                            if (amount != 0)
+                            {   int p=0;
+                                p = oTransactionAccountDAO.UpdateClientBalance((Convert.ToDecimal(clientDataTable.Rows[0]["clientBal"]) + amount), accountNo);
+                                if(p==1)
+                                    m += oChartOfAccountDAO.UpdateAmount((Convert.ToDecimal(clientDataTable.Rows[0]["clientBal"]) + amount), "CurrentBalance", "20004", con, oSqlTransaction);
+                            }
+                          
+                        }
+                        else
+                        {
+                            string accountType = dt.Rows[k]["CoAccNo"].ToString().Substring(0, 1);
+
+                            switch (accountType)
+                            {
+                                case "1":
+                                    if (Convert.ToDecimal(dt.Rows[k]["Debit"]) != 0)
+                                    {
+                                        amount = Convert.ToDecimal(dt.Rows[k]["Debit"]);
+                                    }
+                                    if (Convert.ToDecimal(dt.Rows[k]["Credit"]) != 0)
+                                    {
+                                        amount = -Convert.ToDecimal(dt.Rows[k]["Credit"]);
+                                    }
+                                    break;
+                                case "2":
+                                    if (Convert.ToDecimal(dt.Rows[k]["Debit"]) != 0)
+                                    {
+                                        amount = -Convert.ToDecimal(dt.Rows[k]["Debit"]);
+                                    }
+                                    if (Convert.ToDecimal(dt.Rows[k]["Credit"]) != 0)
+                                    {
+                                        amount = Convert.ToDecimal(dt.Rows[k]["Credit"]);
+                                    }
+                                    break;
+                                case "3":
+                                    if (Convert.ToDecimal(dt.Rows[k]["Debit"]) != 0)
+                                    {
+                                        amount = -Convert.ToDecimal(dt.Rows[k]["Debit"]);
+                                    }
+                                    if (Convert.ToDecimal(dt.Rows[k]["Credit"]) != 0)
+                                    {
+                                        amount = Convert.ToDecimal(dt.Rows[k]["Credit"]);
+                                    }
+                                    break;
+                                case "4":
+                                    if (Convert.ToDecimal(dt.Rows[k]["Debit"]) != 0)
+                                    {
+                                        amount = Convert.ToDecimal(dt.Rows[k]["Debit"]);
+                                    }
+                                    if (Convert.ToDecimal(dt.Rows[k]["Credit"]) != 0)
+                                    {
+                                        amount = -Convert.ToDecimal(dt.Rows[k]["Credit"]);
+                                    }
+                                    break;
+
+                            }
+                           
+                            string condition1 = " where tblChartOfAccount.CoAccNo='" + accountNo + "'";
+                            DataTable dataTableCOA = oChartOfAccountDAO.GetChartOfAccount(condition1);
+                            if ((amount + Convert.ToDecimal(dataTableCOA.Rows[0]["CurrentBalance"])) < 0)
+                            {
+                                r = 1;
+                                message = dt.Rows[k]["AccountNo"].ToString() + ", Not Available Balance!";
+                                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+                                //return;
+                            }
+                            if (amount != 0)
+                            {
+                                m += oChartOfAccountDAO.UpdateAmount((amount + Convert.ToDecimal(dataTableCOA.Rows[0]["CurrentBalance"])), "CurrentBalance", accountNo, con, oSqlTransaction);
+                            }
+                        }
+                    }
+                int n = 0;
+                if (r == 0 && m==dt.Rows.Count)
+                {
+                   
+                    n=oTransactionAccountDAO.UpdateTransactionApprove(true,"Approved",voucherNo,con,oSqlTransaction);
+                    if (n == 1)
+                    {
+                        oSqlTransaction.Commit();
+                        message = "Voucher Approved Successfully"; 
+                    }
+                    else
+                    {
+                      oSqlTransaction.Rollback();
+                      message = "Voucher Not Approved";
+                      con.Close();
+                      ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+                      return;
+                    }
+                   
+
+                }
+                else 
+                {
+                    oSqlTransaction.Rollback();
+                    message = "Voucher Not Approved";
+                }
+                con.Close();
+                ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+                loadGridView2();
+            }
+        }
+    }
+    protected void GridView2_RowDeleting(object sender, GridViewDeleteEventArgs e)
+    {
+       string voucherNO =GridView2.DataKeys[e.RowIndex].Value.ToString();
+       string message = "Data Not Deleted!";
+       int i = oTransactionAccountDAO.DeleteTransaction(voucherNO);
+       if (i == 1)
+       { message = "Data Deleted Successfully"; }
+       ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('" + message + "')", true);
+       loadGridView2();
+    }
+}

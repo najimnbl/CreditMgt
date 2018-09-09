@@ -1,0 +1,221 @@
+﻿using System;
+using System.Collections;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Xml.Linq;
+using System.Data.SqlClient;
+using System.IO;
+using System.Data.SqlTypes;
+
+public partial class CRBUpload : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            LoadBranch(1, "");
+        
+        }
+
+    }
+
+    public void LoadBranch(int a, string code)
+    {
+        DataSet ds = new DataSet();
+        SqlConnection conn = dbconnection.connection();
+        //string quiry = "select code from program where Code <>'" + code + "'  order by code";
+
+        string quiry = "select BranchName,BrCode  from BranchInfo  order by  BranchName";
+
+
+
+        SqlDataAdapter dt = new SqlDataAdapter(quiry, conn);
+        dt.Fill(ds);
+        drpBranch.DataSource = ds;
+        drpBranch.DataTextField = "BranchName";
+        drpBranch.DataValueField = "BrCode";
+        drpBranch.DataBind();
+
+        if (a == 1)
+        {
+            drpBranch.Items.Insert(0, "--Select--");
+
+        }
+
+    }
+
+
+    public void DeletePriviusData()
+    {
+
+        SqlConnection conn = dbconnection.connection();
+        SqlCommand objcmd = new SqlCommand("Delete from  GLPLA2Z ", conn);
+
+        objcmd.ExecuteNonQuery();
+        conn.Close();
+
+
+    }
+
+    protected void btnImport_Click(object sender, EventArgs e)
+    {
+        
+
+        DeletePriviusData();
+        
+        
+        SqlConnection conn = dbconnection.connection();
+        string strFilename = "D:\\Migration\\A2ZGLPL.Txt";
+
+        string line = null;
+        string[] StrArray = new string[12];
+        //DateTime ValueDate;
+        //DateTime MatureDate;
+        //DateTime AsOneDate;
+        //string ValueDate;
+        //string MatureDate;
+        //string AsOneDate;
+        DateTime date = DateTime.Now;
+        string AsOnDate = date.ToLongDateString();
+
+        using (StreamReader file = new StreamReader( strFilename))
+        {
+
+            line = file.ReadLine();
+
+          
+
+
+            
+            while ((line = file.ReadLine()) != null)
+
+            {
+               
+
+                if (!string.IsNullOrEmpty(line) && line.Length > 37)
+                
+                {
+                    int n;
+                    string a;
+                    a = line.Substring(0, 5);
+
+                  
+                    if ((Int32.TryParse(line.Substring(0, 6).Trim(), out n)))
+                   
+                    
+                    {
+                        if (line.Length >= 5)
+                        {
+                            StrArray[0] = line.Substring(0, 6).Trim();
+                        }
+                        else
+                        {
+                            StrArray[0] = null;
+                        }
+
+                        if (line.Length >= 30)
+                        {
+                            StrArray[1] = line.Substring(6, 34).Trim();
+                        }
+                        else
+                        {
+                            StrArray[1] = null;
+                        }
+                       
+                        if (line.Length >= 59)
+                        {
+
+                            if (line.Substring(41, 1).Trim()=="(")
+
+                            {
+                                StrArray[2] = "-" + line.Substring(42, 17).Trim();
+                            }
+                                
+                                else
+                            {
+                                StrArray[2] = line.Substring(42, 17).Trim();
+                            }
+                            
+                            
+                           }
+                        else
+                        {
+                            StrArray[2] = null;
+                        }
+                     
+
+                       
+                        using (SqlCommand cmd = new SqlCommand("SPInsertGLPLA2Z", conn))
+                        {
+                            try
+                            {
+                                cmd.CommandType = CommandType.StoredProcedure;
+                               
+                                if (!string.IsNullOrEmpty(StrArray[0]))
+                                {
+                                    cmd.Parameters.Add("@Legacy", SqlDbType.Char).Value = StrArray[0];
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add("@Legacy", SqlDbType.Char).Value = SqlChars.Null;
+
+                                }
+                                cmd.Parameters.Add("@AcDesc", SqlDbType.VarChar).Value = StrArray[1];
+                                if (!string.IsNullOrEmpty(StrArray[2]))
+                                {
+                                    cmd.Parameters.Add("@ClosingBal", SqlDbType.Decimal).Value = StrArray[2].Replace(",", "");
+
+                                }
+                                else
+                                {
+                                    cmd.Parameters.Add("@ClosingBal", SqlDbType.Decimal).Value = SqlDecimal.Null;
+
+
+                                }
+                                //cmd.Parameters.Add("@BrCode", SqlDbType.Char).Value = Session["BrCode"];
+                                cmd.Parameters.Add("@BrCode", SqlDbType.Char).Value = drpBranch.SelectedValue;
+
+                                
+
+
+                                int noOfRowsAffected = cmd.ExecuteNonQuery();
+
+                                if (noOfRowsAffected > 0)
+                                {
+
+                                    ScriptManager.RegisterClientScriptBlock(Page, this.GetType(), "MessageBox", "alert('A2Z GLPL Data Imported Successfully')", true);
+                                    btnImport.Enabled = true;
+                                }
+                            }
+                            catch (SqlException ex)
+                            {
+                                
+                                ClientScript.RegisterStartupScript(GetType(), "alert", "alert('" + ex + "');", true);
+                            }
+                            finally
+                            {
+                                if (conn.State != ConnectionState.Closed)
+                                {
+                                   
+                                }
+                            }
+                        }
+
+
+
+
+                    }
+                }
+            }
+
+        }
+    
+    }
+}

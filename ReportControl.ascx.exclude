@@ -1,0 +1,12 @@
+﻿<%@ Control Language="C#" AutoEventWireup="true" CodeFile="ReportControl.ascx.cs" Inherits="Reports_ReportControl" %>
+<%@ Register Assembly="CrystalDecisions.Web, Version=13.0.2000.0, Culture=neutral, PublicKeyToken=692fbea5521e1304"
+    Namespace="CrystalDecisions.Web" TagPrefix="CR" %>
+<CR:CrystalReportViewer ID="CrystalReportViewer1" runat="server" 
+    AutoDataBind="true" EnableParameterPrompt="False" 
+    oninit="CrystalReportViewer1_Init" ToolPanelView="None" 
+    DisplayStatusbar="False" EnableToolTips="False" HasCrystalLogo="False" 
+    HasDrilldownTabs="False" HasRefreshButton="True" 
+    HasToggleGroupTreeButton="False" HasToggleParameterPanelButton="False" 
+    ShowAllPageIds="True" />
+
+ 
